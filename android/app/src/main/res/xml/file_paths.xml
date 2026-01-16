@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <external-files-path name="invoice_images" path="invoices/" />
+    <external-files-path name="exports" path="exports/" />
+    <files-path name="internal_images" path="images/" />
+    <cache-path name="cache" path="." />
+</paths>

@@ -1,0 +1,12 @@
+0000000000000000000000000000000000000000 24566badfdbf2070fd43801ee079bdf353e490ca brado <brador82@gmail.com> 1767878410 -0600	clone: from https://github.com/Brador82/Mobile_Invoice_OCR.git
+24566badfdbf2070fd43801ee079bdf353e490ca 6c7467e4037986da1269f3457ee85648cce89215 brado <brador82@gmail.com> 1768142089 -0600	commit: Resolves the fundamental accuracy problem that plagued months of
+6c7467e4037986da1269f3457ee85648cce89215 f698faff8a1d64b3471b24e70dc8496c99ebde97 brado <brador82@gmail.com> 1768184920 -0600	commit: Establish golden ML Kit baseline; clean repo; add docs + packaging
+f698faff8a1d64b3471b24e70dc8496c99ebde97 d0d996720b96a8d1d6b39ea000c8d025da23dc8f brado <brador82@gmail.com> 1768184965 -0600	pull --rebase (start): checkout d0d996720b96a8d1d6b39ea000c8d025da23dc8f
+d0d996720b96a8d1d6b39ea000c8d025da23dc8f f698faff8a1d64b3471b24e70dc8496c99ebde97 brado <brador82@gmail.com> 1768185196 -0600	checkout: moving from d0d996720b96a8d1d6b39ea000c8d025da23dc8f to OCR-adjust/develope
+f698faff8a1d64b3471b24e70dc8496c99ebde97 f698faff8a1d64b3471b24e70dc8496c99ebde97 brado <brador82@gmail.com> 1768185451 -0600	rebase (finish): refs/heads/OCR-adjust/develope onto d0d996720b96a8d1d6b39ea000c8d025da23dc8f
+f698faff8a1d64b3471b24e70dc8496c99ebde97 f698faff8a1d64b3471b24e70dc8496c99ebde97 brado <brador82@gmail.com> 1768185451 -0600	rebase (finish): returning to refs/heads/OCR-adjust/develope
+f698faff8a1d64b3471b24e70dc8496c99ebde97 d0d996720b96a8d1d6b39ea000c8d025da23dc8f brado <brador82@gmail.com> 1768185522 -0600	reset: moving to origin/OCR-adjust/develope
+d0d996720b96a8d1d6b39ea000c8d025da23dc8f 93205f9d74520427654b2e4df372dd1c2d08742a brado <brador82@gmail.com> 1768185592 -0600	commit (cherry-pick): Establish golden ML Kit baseline; clean repo; add docs + packaging
+93205f9d74520427654b2e4df372dd1c2d08742a f103f653f5f1f186c05b41c380d1b170d69f81c5 brado <brador82@gmail.com> 1768186032 -0600	commit: Restore missing wrapper/resources for build
+f103f653f5f1f186c05b41c380d1b170d69f81c5 f0141e7aa3b7a68f2297aa47cd68a7be31ea75e7 brado <brador82@gmail.com> 1768187615 -0600	commit: Improve invoice # and item parsing
+f0141e7aa3b7a68f2297aa47cd68a7be31ea75e7 a3b5e3a2d1d9707c2350194905afbc9c236ed99a Brador82 <brador82@gmail.com> 1768551646 -0600	commit: Complete Mobile Invoice OCR v2.0 with all features

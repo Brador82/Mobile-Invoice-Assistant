@@ -1,0 +1,6 @@
+Unnamed repository; edit this file 'description' to name the repository.
+Configure Gradle build system for Android project
+
+Added Gradle wrapper files (gradlew, gradlew.bat) and configuration
+to enable command-line builds without requiring local Gradle installation.
+Updated to Gradle 8.9 for JDK 21 compatibility.

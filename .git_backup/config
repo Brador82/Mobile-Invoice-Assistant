@@ -1,0 +1,16 @@
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = false
+	logallrefupdates = true
+	symlinks = false
+	ignorecase = true
+[remote "origin"]
+	url = https://github.com/Brador82/Mobile_Invoice_OCR.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "OCR-adjust/develope"]
+	remote = origin
+	merge = refs/heads/OCR-adjust/develope
+	vscode-merge-base = origin/OCR-adjust/develope
+	gk-last-accessed = 2026-01-16T08:23:16.938Z
+	gk-last-modified = 2026-01-16T08:23:16.938Z
