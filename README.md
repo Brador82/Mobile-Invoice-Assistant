@@ -15,10 +15,13 @@
 - ✍️ **Signature Capture** - Digital signature pad
 - 📦 **Items Selection** - Multi-select for 10 appliance types
 - 🚚 **POD Photos** - Proof of delivery capture (3 photos per invoice)
-- 🗺️ **Route Optimization** - TSP algorithm for most efficient delivery routes
-- 🧭 **Turn-by-Turn Navigation** - Google Maps integration with waypoints
-- � **Drag-and-Drop Reordering** - Long-press and drag to manually reorder invoices
+- 🗺️ **Split-Screen Route Optimization** - Map + interactive delivery list 🆕
+- 🔄 **Drag-and-Drop Reordering** - Long-press to manually adjust route order 🆕
+- 📱 **In-App Navigation** - Call customers and navigate without leaving the app 🆕
+- 🧭 **Dual Navigation Modes** - Full route or individual stop navigation 🆕
+- 🗺️ **Expand/Collapse Map** - Toggle between split-view and full-screen map 🆕
 - 📤 **Export** - CSV, Excel (TSV), JSON, and Markdown formats
+- ☁️ **Cloud Sharing** - Direct export to Google Drive, Dropbox, OneDrive
 - 💾 **Data Persistence** - Survives app restart and device reboot
 
 ## 🚀 Quick Start
