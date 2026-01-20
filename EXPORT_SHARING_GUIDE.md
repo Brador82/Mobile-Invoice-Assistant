@@ -97,6 +97,6 @@ The OCR now intelligently extracts:
 
 ---
 
-**Last Updated**: January 15, 2026
+**Last Updated**: January 20, 2026
 **Version**: 1.1.1
 **Feature Status**: ✅ Simplified Export Flow

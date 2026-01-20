@@ -1,6 +1,6 @@
 # ✅ Mobile Invoice OCR - Feature Implementation Checklist
 
-**Last Updated:** January 15, 2026
+**Last Updated:** January 20, 2026
 
 ## Core Features Implemented
 
@@ -86,10 +86,32 @@
 - [x] "Change Signature" button when captured
 - [x] Auto-save on navigation
 
-### 🗺️ Route Optimization (Jan 15, 2026)
+### 🗺️ Route Optimization - ENHANCED Jan 19, 2026 🆕
 
-- [x] Google Maps SDK integration
-- [x] TSP (Traveling Salesman Problem) algorithm
+- [x] **Split-Screen UI**:
+  - Map view on top (50% screen)
+  - Delivery list on bottom (50% screen)
+  - Seamless integration of both interfaces
+- [x] **Google Maps SDK integration** (embedded in app)
+- [x] **Expand/Collapse Controls**:
+  - Toggle button (top-right corner)
+  - Full-screen map mode
+  - Split-screen mode
+  - Smooth transitions
+- [x] **Interactive Delivery List**:
+  - RecyclerView with card-based UI
+  - Each card shows: stop #, customer, address, items
+  - Call button (direct dial)
+  - Navigate button (turn-by-turn to stop)
+  - Drag handle for reordering
+- [x] **Drag-and-Drop Reordering**:
+  - Long-press drag handle to initiate
+  - Smooth drag animations
+  - Visual feedback (transparency, scaling)
+  - Live map updates during drag
+  - Automatic route recalculation
+  - Stop numbers update instantly
+- [x] **TSP (Traveling Salesman Problem) algorithm**
 - [x] Nearest Neighbor implementation
 - [x] Address geocoding
 - [x] Haversine distance calculation
@@ -98,16 +120,25 @@
   - Numbered markers for each stop
   - Polylines connecting waypoints
   - Current location indicator
-- [x] Turn-by-turn navigation launch
+- [x] **Dual Navigation Modes**:
+  - "Start Navigation": All stops in Google Maps
+  - Individual stop navigation
+- [x] **Map Controls**:
+  - Recenter button (fit all stops)
+  - Zoom controls
+  - My location button
 - [x] Apply optimized order to invoice list
+- [x] Real-time distance recalculation
 
-### 🔄 Manual Reordering (Jan 15, 2026)
+### 🔄 Manual Reordering (Enhanced Jan 19, 2026)
 
-- [x] ItemTouchHelper drag-and-drop
-- [x] Long-press gesture to initiate drag
-- [x] Visual feedback (transparency, elevation)
-- [x] onOrderChanged callback
-- [x] Smooth animations
+- [x] ItemTouchHelper drag-and-drop in route view
+- [x] Drag handle on each delivery card
+- [x] Touch-based drag initiation
+- [x] Visual feedback (transparency, elevation, scaling)
+- [x] Smooth animations during drag
+- [x] Live route updates as items move
+- [x] Automatic renumbering of stops
 
 ### 📤 Export & Share - ENHANCED Jan 15, 2026
 

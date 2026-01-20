@@ -1,56 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".RouteMapActivity">
 
-    <!-- Google Map Fragment -->
-    <fragment
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
+    <!-- Map Container with Expand/Collapse Controls -->
+    <RelativeLayout
+        android:id="@+id/mapContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/bottomPanel" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-    <!-- Bottom Panel with Route Info and Actions -->
-    <LinearLayout
-        android:id="@+id/bottomPanel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@android:color/white"
-        android:elevation="8dp"
-        android:orientation="vertical"
-        android:padding="16dp">
+        <!-- Google Map Fragment -->
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-        <!-- Progress Bar -->
+        <!-- Map Control Overlay (Top Right) -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="16dp"
+            android:background="#CC000000"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <!-- Expand/Collapse Map Button -->
+            <ImageButton
+                android:id="@+id/btnToggleMapSize"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Toggle map size"
+                android:src="@android:drawable/ic_menu_zoom"
+                android:tint="@android:color/white" />
+
+            <!-- Recenter Map Button -->
+            <ImageButton
+                android:id="@+id/btnRecenterMap"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Recenter map"
+                android:src="@android:drawable/ic_menu_mylocation"
+                android:tint="@android:color/white" />
+        </LinearLayout>
+
+        <!-- Progress Indicator Overlay -->
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="4dp"
+            android:layout_alignParentBottom="true"
             android:indeterminate="true"
             android:visibility="gone" />
 
-        <!-- Route Summary -->
+    </RelativeLayout>
+
+    <!-- Route Summary Bar -->
+    <LinearLayout
+        android:id="@+id/summaryBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#2196F3"
+        android:elevation="4dp"
+        android:orientation="vertical"
+        android:padding="12dp">
+
         <TextView
             android:id="@+id/tvRouteSummary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="12dp"
             android:text="Calculating optimal route..."
             android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- Delivery Stops List Container -->
+    <LinearLayout
+        android:id="@+id/stopsListContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@android:color/white"
+        android:orientation="vertical">
+
+        <!-- List Header -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#F5F5F5"
+            android:padding="12dp"
+            android:text="Delivery Sequence"
             android:textColor="@android:color/black"
             android:textSize="16sp"
             android:textStyle="bold" />
 
-        <!-- Action Buttons Row -->
+        <!-- RecyclerView for Delivery Stops -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewStops"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="8dp"
+            tools:listitem="@layout/item_route_stop" />
+
+        <!-- Action Buttons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="#F5F5F5"
+            android:elevation="8dp"
             android:orientation="horizontal"
+            android:padding="12dp"
             android:weightSum="2">
 
             <!-- Start Navigation Button -->
@@ -66,7 +141,7 @@
                 android:textColor="@android:color/white"
                 android:textStyle="bold" />
 
-            <!-- Reorder List Button -->
+            <!-- Apply Order Button -->
             <Button
                 android:id="@+id/btnReorderList"
                 android:layout_width="0dp"
@@ -81,31 +156,6 @@
 
         </LinearLayout>
 
-        <!-- Route Details (Optional - can be expanded) -->
-        <TextView
-            android:id="@+id/tvRouteDetails"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textAlignment="center"
-            android:textColor="@android:color/darker_gray"
-            android:textSize="12sp"
-            android:visibility="gone"
-            tools:text="Route details will appear here" />
-
     </LinearLayout>
 
-    <!-- Floating Action Button - Recenter Map -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabRecenter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/bottomPanel"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="16dp"
-        android:backgroundTint="#FF9800"
-        android:contentDescription="Recenter map"
-        android:src="@android:drawable/ic_menu_mylocation"
-        android:visibility="gone" />
-
-</RelativeLayout>
+</LinearLayout>

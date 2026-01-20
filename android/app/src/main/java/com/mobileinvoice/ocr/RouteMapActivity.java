@@ -9,11 +9,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -33,6 +38,7 @@ import java.util.List;
 
 /**
  * Route Map Activity - Display optimized delivery route on Google Maps
+ * with split-screen view showing both map and delivery list
  */
 public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final String TAG = "RouteMapActivity";
@@ -43,6 +49,9 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
     private RouteOptimizer.OptimizedRoute optimizedRoute;
     private Location currentLocation;
     private ActivityResultLauncher<String> requestLocationPermissionLauncher;
+    private RouteStopAdapter stopAdapter;
+    private ItemTouchHelper itemTouchHelper;
+    private boolean isMapExpanded = false;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +63,7 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         
         setupPermissionLauncher();
+        setupRecyclerView();
         setupClickListeners();
         
         // Initialize map
@@ -66,6 +76,112 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
         // Show loading state
         binding.progressBar.setVisibility(View.VISIBLE);
         binding.tvRouteSummary.setText("Calculating optimal route...");
+    }
+    
+    private void setupRecyclerView() {
+        stopAdapter = new RouteStopAdapter(new RouteStopAdapter.OnStopClickListener() {
+            @Override
+            public void onCallClick(RouteOptimizer.RoutePoint stop) {
+                handleCallCustomer(stop);
+            }
+            
+            @Override
+            public void onNavigateClick(RouteOptimizer.RoutePoint stop) {
+                handleNavigateToStop(stop);
+            }
+        }, new RouteStopAdapter.OnStartDragListener() {
+            @Override
+            public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+                if (itemTouchHelper != null) {
+                    itemTouchHelper.startDrag(viewHolder);
+                }
+            }
+        });
+        
+        binding.recyclerViewStops.setLayoutManager(new LinearLayoutManager(this));
+        binding.recyclerViewStops.setAdapter(stopAdapter);
+        
+        // Setup drag and drop
+        RouteItemTouchHelper.OnItemMovedListener moveListener = 
+            new RouteItemTouchHelper.OnItemMovedListener() {
+                @Override
+                public void onItemMoved(int fromPosition, int toPosition) {
+                    // Update map when items are reordered
+                    updateMapAfterReorder();
+                }
+            };
+        
+        RouteItemTouchHelper callback = new RouteItemTouchHelper(stopAdapter, moveListener);
+        itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(binding.recyclerViewStops);
+    }
+    
+    /**
+     * Redraw the route on the map after manual reordering
+     */
+    private void updateMapAfterReorder() {
+        if (googleMap == null || optimizedRoute == null) {
+            return;
+        }
+        
+        // Update the optimized route with new order
+        optimizedRoute.orderedPoints = stopAdapter.getStops();
+        
+        // Recalculate total distance
+        recalculateRouteDistance();
+        
+        // Redraw map
+        double startLat = currentLocation != null ? 
+            currentLocation.getLatitude() : optimizedRoute.orderedPoints.get(0).latitude;
+        double startLng = currentLocation != null ? 
+            currentLocation.getLongitude() : optimizedRoute.orderedPoints.get(0).longitude;
+        
+        displayRouteOnMap(startLat, startLng);
+        
+        // Update summary
+        updateRouteSummary();
+    }
+    
+    /**
+     * Recalculate route distance after reordering
+     */
+    private void recalculateRouteDistance() {
+        if (optimizedRoute == null || optimizedRoute.orderedPoints.isEmpty()) {
+            return;
+        }
+        
+        double totalDistance = 0;
+        double prevLat = currentLocation != null ? 
+            currentLocation.getLatitude() : optimizedRoute.orderedPoints.get(0).latitude;
+        double prevLng = currentLocation != null ? 
+            currentLocation.getLongitude() : optimizedRoute.orderedPoints.get(0).longitude;
+        
+        for (RouteOptimizer.RoutePoint point : optimizedRoute.orderedPoints) {
+            double distance = RouteOptimizer.calculateDistance(
+                prevLat, prevLng, point.latitude, point.longitude);
+            totalDistance += distance;
+            prevLat = point.latitude;
+            prevLng = point.longitude;
+        }
+        
+        optimizedRoute.totalDistance = totalDistance;
+    }
+    
+    /**
+     * Update the route summary text
+     */
+    private void updateRouteSummary() {
+        if (optimizedRoute == null || optimizedRoute.orderedPoints.isEmpty()) {
+            return;
+        }
+        
+        String summary = String.format(
+            "Optimized Route\n%d stops • %.1f km • %s estimated",
+            optimizedRoute.totalStops,
+            optimizedRoute.totalDistance,
+            RouteOptimizer.estimateTravelTime(optimizedRoute.totalDistance)
+        );
+        binding.tvRouteSummary.setText(summary);
     }
     
     private void setupPermissionLauncher() {
@@ -84,6 +200,13 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
     }
     
     private void setupClickListeners() {
+        // Toggle map size (expand/collapse)
+        binding.btnToggleMapSize.setOnClickListener(v -> toggleMapSize());
+        
+        // Recenter map
+        binding.btnRecenterMap.setOnClickListener(v -> recenterMap());
+        
+        // Start navigation
         binding.btnStartNavigation.setOnClickListener(v -> {
             if (optimizedRoute != null && !optimizedRoute.orderedPoints.isEmpty()) {
                 startGoogleMapsNavigation();
@@ -92,6 +215,7 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
             }
         });
         
+        // Apply order to list
         binding.btnReorderList.setOnClickListener(v -> {
             if (optimizedRoute != null && !optimizedRoute.orderedPoints.isEmpty()) {
                 reorderInvoicesInDatabase();
@@ -99,6 +223,100 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
                 Toast.makeText(this, "No route to apply", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+    
+    /**
+     * Toggle between split-screen and full-screen map view
+     */
+    private void toggleMapSize() {
+        LinearLayout.LayoutParams mapParams = 
+            (LinearLayout.LayoutParams) binding.mapContainer.getLayoutParams();
+        LinearLayout.LayoutParams listParams = 
+            (LinearLayout.LayoutParams) binding.stopsListContainer.getLayoutParams();
+        
+        if (isMapExpanded) {
+            // Return to split view
+            mapParams.weight = 1;
+            listParams.weight = 1;
+            binding.stopsListContainer.setVisibility(View.VISIBLE);
+            binding.summaryBar.setVisibility(View.VISIBLE);
+            isMapExpanded = false;
+        } else {
+            // Expand map to full screen
+            mapParams.weight = 1;
+            listParams.weight = 0;
+            binding.stopsListContainer.setVisibility(View.GONE);
+            binding.summaryBar.setVisibility(View.GONE);
+            isMapExpanded = true;
+        }
+        
+        binding.mapContainer.setLayoutParams(mapParams);
+        binding.stopsListContainer.setLayoutParams(listParams);
+    }
+    
+    /**
+     * Recenter map to show all route points
+     */
+    private void recenterMap() {
+        if (googleMap != null && optimizedRoute != null && !optimizedRoute.orderedPoints.isEmpty()) {
+            LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+            
+            if (currentLocation != null) {
+                boundsBuilder.include(new LatLng(
+                    currentLocation.getLatitude(), 
+                    currentLocation.getLongitude()));
+            }
+            
+            for (RouteOptimizer.RoutePoint point : optimizedRoute.orderedPoints) {
+                boundsBuilder.include(new LatLng(point.latitude, point.longitude));
+            }
+            
+            try {
+                LatLngBounds bounds = boundsBuilder.build();
+                int padding = 150;
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
+            } catch (Exception e) {
+                Log.e(TAG, "Error recentering map", e);
+            }
+        }
+    }
+    
+    /**
+     * Handle call customer action
+     */
+    private void handleCallCustomer(RouteOptimizer.RoutePoint stop) {
+        String phoneNumber = stop.invoice.getPhone();
+        
+        if (phoneNumber != null && !phoneNumber.isEmpty()) {
+            Intent callIntent = new Intent(Intent.ACTION_DIAL);
+            callIntent.setData(Uri.parse("tel:" + phoneNumber));
+            startActivity(callIntent);
+        } else {
+            Toast.makeText(this, "No phone number available", Toast.LENGTH_SHORT).show();
+        }
+    }
+    
+    /**
+     * Handle navigate to specific stop
+     */
+    private void handleNavigateToStop(RouteOptimizer.RoutePoint stop) {
+        String uri = String.format("google.navigation:q=%f,%f", 
+            stop.latitude, stop.longitude);
+        
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+        intent.setPackage("com.google.android.apps.maps");
+        
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        } else {
+            // Fallback to regular maps
+            String fallbackUri = String.format("geo:%f,%f?q=%f,%f(%s)",
+                stop.latitude, stop.longitude,
+                stop.latitude, stop.longitude,
+                Uri.encode(stop.invoice.getCustomerName()));
+            Intent fallbackIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(fallbackUri));
+            startActivity(fallbackIntent);
+        }
     }
     
     @Override
@@ -192,6 +410,9 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
                     // Enable action buttons
                     binding.btnStartNavigation.setEnabled(true);
                     binding.btnReorderList.setEnabled(true);
+                    
+                    // Update RecyclerView with stops
+                    stopAdapter.setStops(optimizedRoute.orderedPoints);
                     
                     Toast.makeText(this, "Route optimized successfully!", Toast.LENGTH_SHORT).show();
                 });
