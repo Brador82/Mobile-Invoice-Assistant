@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Mobile Invoice OCR</string>
+    <!-- app_name is set dynamically via product flavors in build.gradle -->
     <string name="upload_images">Upload Images</string>
     <string name="capture_invoice">Capture Invoice</string>
     <string name="process_ocr">Process with OCR</string>

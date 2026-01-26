@@ -12,9 +12,9 @@
     <path
         android:fillColor="#E0E0E0"
         android:pathData="M66,22 L66,34 L78,34 Z" />
-    <!-- Invoice header line -->
+    <!-- Invoice header line - Orange for V2 -->
     <path
-        android:fillColor="#1976D2"
+        android:fillColor="#FF6F00"
         android:pathData="M36,32 L60,32 L60,38 L36,38 Z" />
     <!-- Text lines on invoice -->
     <path
@@ -30,23 +30,30 @@
     <path
         android:fillColor="#4CAF50"
         android:pathData="M62,68 L72,68 L72,74 L62,74 Z" />
-    <!-- Scan line indicator -->
+    <!-- Scan line indicator - Cyan for V2 -->
     <path
-        android:fillColor="#FF5722"
+        android:fillColor="#00BCD4"
         android:pathData="M26,50 L82,50 L82,52 L26,52 Z"
         android:strokeWidth="0"
         android:fillAlpha="0.8" />
-    <!-- Scanner corner brackets -->
+    <!-- Scanner corner brackets - Orange for V2 -->
     <path
-        android:fillColor="#1976D2"
+        android:fillColor="#FF6F00"
         android:pathData="M26,20 L26,30 L28,30 L28,22 L36,22 L36,20 Z" />
     <path
-        android:fillColor="#1976D2"
+        android:fillColor="#FF6F00"
         android:pathData="M82,20 L72,20 L72,22 L80,22 L80,30 L82,30 Z" />
     <path
-        android:fillColor="#1976D2"
+        android:fillColor="#FF6F00"
         android:pathData="M26,88 L26,78 L28,78 L28,86 L36,86 L36,88 Z" />
     <path
-        android:fillColor="#1976D2"
+        android:fillColor="#FF6F00"
         android:pathData="M82,88 L72,88 L72,86 L80,86 L80,78 L82,78 Z" />
+    <!-- V2 badge -->
+    <path
+        android:fillColor="#FF6F00"
+        android:pathData="M70,70 L86,70 L86,86 L70,86 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M73,74 L75,74 L76,78 L77,74 L79,74 L77,80 L79,80 L79,82 L77,82 L77,84 L75,84 L75,82 L73,82 L73,80 L75,80 Z" />
 </vector>

@@ -16,6 +16,23 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Product flavors for isolated versions
+    flavorDimensions "version"
+    productFlavors {
+        production {
+            dimension "version"
+            applicationIdSuffix ""
+            versionNameSuffix ""
+            resValue "string", "app_name", "Mobile Invoice OCR"
+        }
+        v2 {
+            dimension "version"
+            applicationIdSuffix ".v2"
+            versionNameSuffix "-v2"
+            resValue "string", "app_name", "Invoice OCR V2"
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
