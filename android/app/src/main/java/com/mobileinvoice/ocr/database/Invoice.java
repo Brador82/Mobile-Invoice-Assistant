@@ -23,6 +23,7 @@ public class Invoice {
     private String originalImagePath;
     private String rawOcrText;
     private long timestamp;
+    private int displayOrder; // For persisting custom sort order (0 = default/timestamp order)
 
     public Invoice() {
         this.timestamp = System.currentTimeMillis();
@@ -43,6 +44,7 @@ public class Invoice {
     public String getOriginalImagePath() { return originalImagePath; }
     public String getRawOcrText() { return rawOcrText; }
     public long getTimestamp() { return timestamp; }
+    public int getDisplayOrder() { return displayOrder; }
 
     // Setters
     public void setId(int id) { this.id = id; }
@@ -59,4 +61,5 @@ public class Invoice {
     public void setOriginalImagePath(String originalImagePath) { this.originalImagePath = originalImagePath; }
     public void setRawOcrText(String rawOcrText) { this.rawOcrText = rawOcrText; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
+    public void setDisplayOrder(int displayOrder) { this.displayOrder = displayOrder; }
 }

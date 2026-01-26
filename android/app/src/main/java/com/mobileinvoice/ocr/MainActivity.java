@@ -346,9 +346,17 @@ public class MainActivity extends AppCompatActivity implements InvoiceAdapter.On
         // Update the main invoices list with new order
         invoices.clear();
         invoices.addAll(reorderedList);
-        
-        // Optional: Save order to database (you could add a displayOrder field to Invoice entity)
-        Toast.makeText(this, "Order updated - Long press to drag invoices", Toast.LENGTH_SHORT).show();
+
+        // Save displayOrder to database
+        new Thread(() -> {
+            for (int i = 0; i < reorderedList.size(); i++) {
+                Invoice invoice = reorderedList.get(i);
+                database.invoiceDao().updateDisplayOrder(invoice.getId(), i + 1);
+            }
+            runOnUiThread(() -> {
+                Toast.makeText(this, "Order saved", Toast.LENGTH_SHORT).show();
+            });
+        }).start();
     }
     
     /**

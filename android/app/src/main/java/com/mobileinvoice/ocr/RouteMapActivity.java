@@ -537,22 +537,24 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
         if (optimizedRoute == null || optimizedRoute.orderedPoints.isEmpty()) {
             return;
         }
-        
+
         new Thread(() -> {
             try {
-                // Update invoice order in database
-                // This could be done by adding a "routeOrder" field to Invoice entity
-                // For now, we'll just show a toast
-                
+                // Update displayOrder for each invoice based on route order
+                for (int i = 0; i < optimizedRoute.orderedPoints.size(); i++) {
+                    RouteOptimizer.RoutePoint point = optimizedRoute.orderedPoints.get(i);
+                    database.invoiceDao().updateDisplayOrder(point.invoice.getId(), i + 1);
+                }
+
                 runOnUiThread(() -> {
-                    Toast.makeText(this, 
-                        "Route order saved! " + optimizedRoute.totalStops + " stops reordered", 
+                    Toast.makeText(this,
+                        "Route order saved! " + optimizedRoute.totalStops + " stops reordered",
                         Toast.LENGTH_LONG).show();
-                    
+
                     // Return to main activity
                     finish();
                 });
-                
+
             } catch (Exception e) {
                 Log.e(TAG, "Error reordering invoices", e);
                 runOnUiThread(() -> {
