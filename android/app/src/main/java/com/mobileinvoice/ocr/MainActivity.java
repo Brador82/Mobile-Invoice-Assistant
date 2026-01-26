@@ -159,7 +159,8 @@ public class MainActivity extends AppCompatActivity implements InvoiceAdapter.On
                     invoice.setRawOcrText(result.rawText);
                     invoice.setOriginalImagePath(imageUri.toString());
                     invoice.setTimestamp(System.currentTimeMillis());
-                    
+                    invoice.setDisplayOrder(invoices.size() + index);
+
                     // Save to database
                     long newId = database.invoiceDao().insert(invoice);
                     invoice.setId((int) newId);
@@ -289,6 +290,7 @@ public class MainActivity extends AppCompatActivity implements InvoiceAdapter.On
             invoice.setAddress(sampleAddresses[i % sampleAddresses.length]);
             invoice.setPhone(samplePhones[i % samplePhones.length]);
             invoice.setItems("Sample items");
+            invoice.setDisplayOrder(invoices.size());
             invoices.add(invoice);
         }
         
@@ -346,9 +348,16 @@ public class MainActivity extends AppCompatActivity implements InvoiceAdapter.On
         // Update the main invoices list with new order
         invoices.clear();
         invoices.addAll(reorderedList);
-        
-        // Optional: Save order to database (you could add a displayOrder field to Invoice entity)
-        Toast.makeText(this, "Order updated - Long press to drag invoices", Toast.LENGTH_SHORT).show();
+
+        // Save display order to database
+        new Thread(() -> {
+            for (int i = 0; i < reorderedList.size(); i++) {
+                reorderedList.get(i).setDisplayOrder(i);
+            }
+            database.invoiceDao().updateAll(reorderedList);
+        }).start();
+
+        Toast.makeText(this, "Order saved", Toast.LENGTH_SHORT).show();
     }
     
     /**

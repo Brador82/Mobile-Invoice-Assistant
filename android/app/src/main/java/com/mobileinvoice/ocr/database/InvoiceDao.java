@@ -17,10 +17,13 @@ public interface InvoiceDao {
     @Update
     void update(Invoice invoice);
 
+    @Update
+    void updateAll(List<Invoice> invoices);
+
     @Delete
     void delete(Invoice invoice);
 
-    @Query("SELECT * FROM invoices ORDER BY timestamp DESC")
+    @Query("SELECT * FROM invoices ORDER BY displayOrder ASC, timestamp DESC")
     LiveData<List<Invoice>> getAllInvoices();
 
     @Query("SELECT * FROM invoices WHERE id = :id")
@@ -29,7 +32,7 @@ public interface InvoiceDao {
     @Query("SELECT * FROM invoices WHERE id = :id")
     Invoice getInvoiceByIdSync(int id);
 
-    @Query("SELECT * FROM invoices ORDER BY timestamp DESC")
+    @Query("SELECT * FROM invoices ORDER BY displayOrder ASC, timestamp DESC")
     List<Invoice> getAllInvoicesSync();
 
     @Query("DELETE FROM invoices")
