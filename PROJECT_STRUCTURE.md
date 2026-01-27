@@ -3,7 +3,7 @@
 ## 📁 Clean Project Organization
 
 ```
-Mobile_Invoice_OCR/
+Mobile-Invoice-Assistant/
 │
 ├── 📱 android/                          # Android application
 │   ├── app/
@@ -82,14 +82,19 @@ Mobile_Invoice_OCR/
 ### Core Application
 ```
 android/app/src/main/java/com/mobileinvoice/ocr/
-├── MainActivity.java              (270 lines) - Image upload, OCR, export
-├── InvoiceDetailActivity.java     (270 lines) - Edit invoice, POD, signature
-├── CameraActivity.java            (???) - Camera capture
-├── SignatureActivity.java         (???) - Signature drawing
-├── SignatureView.java             (???) - Custom canvas view
-├── InvoiceAdapter.java            (???) - List adapter
-├── OCRProcessorMLKit.java         (???) - ML Kit text recognition
-└── ExportHelper.java              (280 lines) - CSV/Excel/JSON export
+├── MainActivity.java              (396 lines) - Image upload, OCR, export
+├── InvoiceDetailActivity.java     (641 lines) - Edit invoice, POD, signature
+├── CameraActivity.java            (137 lines) - Camera capture
+├── SignatureActivity.java         (88 lines) - Signature drawing
+├── SignatureView.java             (90 lines) - Custom canvas view
+├── InvoiceAdapter.java            (123 lines) - List adapter
+├── OCRProcessorMLKit.java         (797 lines) - ML Kit text recognition
+├── ExportHelper.java              (649 lines) - CSV/Excel/JSON export
+├── RouteMapActivity.java          (564 lines) - Split-screen map view
+├── RouteOptimizer.java            (241 lines) - TSP algorithm
+├── RouteStopAdapter.java          (157 lines) - Route list adapter
+├── RouteItemTouchHelper.java      (104 lines) - Drag-and-drop support
+└── ItemMoveCallback.java          (72 lines) - Move callback interface
 ```
 
 ### Database Layer
@@ -161,9 +166,9 @@ android/gradle.properties           # Gradle JVM args
 
 | Category | Count | Status |
 |----------|-------|--------|
-| **Active Java Files** | 12 | ✅ Production |
-| **Layout XMLs** | 6 | ✅ Production |
-| **Documentation** | 12 | ✅ Current |
+| **Active Java Files** | 17 | ✅ Production |
+| **Layout XMLs** | 8 | ✅ Production |
+| **Documentation** | 30+ | ✅ Current |
 | **Build Scripts** | 2 | ✅ Utilities |
 | **Archived Files** | 14 | 📦 Backup |
 | **Legacy Code** | 2 | 📦 Reference |
@@ -240,6 +245,6 @@ android/gradle.properties           # Gradle JVM args
 
 ---
 
-**Last Updated:** January 11, 2026  
-**Version:** 1.0.0  
+**Last Updated:** January 27, 2026
+**Version:** 1.2.0
 **Status:** Production Ready 🚀

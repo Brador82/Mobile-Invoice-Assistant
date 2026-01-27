@@ -557,6 +557,6 @@ new Thread(() -> {
 
 ## Support
 
-- **Documentation**: https://github.com/Brador82/Mobile_Invoice_OCR/wiki
-- **Issues**: https://github.com/Brador82/Mobile_Invoice_OCR/issues
+- **Documentation**: https://github.com/Brador82/Mobile-Invoice-Assistant/wiki
+- **Issues**: https://github.com/Brador82/Mobile-Invoice-Assistant/issues
 - **API Questions**: Create issue with `api` label
