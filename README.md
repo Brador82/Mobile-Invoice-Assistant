@@ -2,7 +2,7 @@
 
 **A production-ready Android app for invoice scanning, data extraction, and delivery management.**
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Version](https://img.shields.io/badge/version-1.2.0-blue)
 ![Status](https://img.shields.io/badge/status-production-green)
 ![Platform](https://img.shields.io/badge/platform-Android-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-orange)
@@ -38,13 +38,11 @@
 cd android
 
 # Build debug APK
-.\gradlew assembleDebug
+./gradlew assembleDebug      # Linux/macOS
+.\gradlew assembleDebug      # Windows PowerShell
 
 # Install on connected device
-adb install app\build\outputs\apk\debug\app-debug.apk
-
-# Or use the quick script
-.\build-and-install.bat
+adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
 **Detailed guide:** [docs/guides/VSCODE_BUILD_GUIDE.md](docs/guides/VSCODE_BUILD_GUIDE.md) ⭐
@@ -110,9 +108,9 @@ adb install app\build\outputs\apk\debug\app-debug.apk
 └─────────────────────────────────────────────┘
 ```
 
-## 📱 Screenshots
+## 📱 App Features
 
-*(Screenshots coming soon)*
+See [FEATURES.md](FEATURES.md) for a complete list of implemented features with details.
 
 ## 🛠️ Tech Stack
 
@@ -130,7 +128,7 @@ adb install app\build\outputs\apk\debug\app-debug.apk
 ## 📦 Project Structure
 
 ```
-Mobile_Invoice_OCR/
+Mobile-Invoice-Assistant/
 ├── android/              # Android application
 │   ├── app/src/main/java/  # Source code
 │   ├── build.gradle        # Dependencies
@@ -147,13 +145,15 @@ Mobile_Invoice_OCR/
 
 ```bash
 # Run unit tests
-.\gradlew test
+./gradlew test              # Linux/macOS
+.\gradlew test              # Windows PowerShell
 
 # Run instrumentation tests (requires device)
-.\gradlew connectedAndroidTest
+./gradlew connectedAndroidTest
 
 # View logs
-adb logcat | findstr "mobileinvoice"
+adb logcat | grep "mobileinvoice"      # Linux/macOS
+adb logcat | findstr "mobileinvoice"   # Windows
 ```
 
 ## 🤝 Contributing
@@ -172,13 +172,17 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 
 ## 📞 Support
 
-- 📧 Email: [your-email@example.com]
-- 🐛 Issues: [GitHub Issues](https://github.com/Brador82/Mobile_Invoice_OCR/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/Brador82/Mobile_Invoice_OCR/discussions)
+- 🐛 Issues: [GitHub Issues](https://github.com/Brador82/Mobile-Invoice-Assistant/issues)
+- 💬 Discussions: [GitHub Discussions](https://github.com/Brador82/Mobile-Invoice-Assistant/discussions)
 
 ## 🗺️ Roadmap
 
-- [ ] Cloud sync (Google Drive, Dropbox)
+### Completed
+- [x] Cloud sharing (Google Drive, Dropbox, OneDrive) - v1.2.0
+- [x] Route optimization with split-screen map - v1.1.0
+- [x] Drag-and-drop reordering - v1.1.0
+
+### Planned
 - [ ] PDF export with images
 - [ ] Barcode scanning
 - [ ] Statistics dashboard
@@ -189,4 +193,4 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 
 **Made with ❤️ for delivery drivers and logistics teams**
 
-**Status:** Production Ready 🚀 | **Version:** 1.0.0 | **Last Updated:** January 11, 2026
+**Status:** Production Ready 🚀 | **Version:** 1.2.0 | **Last Updated:** January 27, 2026

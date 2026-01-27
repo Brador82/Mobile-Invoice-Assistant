@@ -305,5 +305,5 @@ All invoices are stored in local SQLite database:
 ## Support
 
 For questions or issues:
-- GitHub: https://github.com/Brador82/Mobile_Invoice_OCR/issues
-- Documentation: https://github.com/Brador82/Mobile_Invoice_OCR/wiki
+- GitHub: https://github.com/Brador82/Mobile-Invoice-Assistant/issues
+- Documentation: https://github.com/Brador82/Mobile-Invoice-Assistant/wiki

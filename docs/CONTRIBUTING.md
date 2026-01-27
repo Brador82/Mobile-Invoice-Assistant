@@ -55,7 +55,7 @@ cd Mobile_Invoice_OCR
 
 3. Add upstream remote:
 ```bash
-git remote add upstream https://github.com/Brador82/Mobile_Invoice_OCR.git
+git remote add upstream https://github.com/Brador82/Mobile-Invoice-Assistant.git
 ```
 
 4. Create a feature branch:
@@ -364,10 +364,10 @@ Update these files as needed:
 
 ## Getting Help
 
-- **Questions**: Open a GitHub Discussion
+- **Questions**: Open a [GitHub Discussion](https://github.com/Brador82/Mobile-Invoice-Assistant/discussions)
 - **Bugs**: Create an issue with `bug` label
 - **Features**: Create an issue with `enhancement` label
-- **Security**: Email security@github.com (do not open public issue)
+- **Security**: Open a private security advisory on GitHub (do not open public issue)
 
 ## Recognition
 

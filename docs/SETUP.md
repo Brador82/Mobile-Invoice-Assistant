@@ -30,17 +30,17 @@ Complete instructions for setting up the Mobile Invoice OCR project from scratch
 
 ```bash
 # Clone the repository
-git clone https://github.com/Brador82/Mobile_Invoice_OCR.git
+git clone https://github.com/Brador82/Mobile-Invoice-Assistant.git
 
 # Navigate to Android project directory
-cd Mobile_Invoice_OCR/android
+cd Mobile-Invoice-Assistant/android
 ```
 
 ### 2. Open in Android Studio
 
 1. Launch Android Studio
 2. Click **File → Open**
-3. Navigate to `Mobile_Invoice_OCR/android` folder
+3. Navigate to `Mobile-Invoice-Assistant/android` folder
 4. Click **OK**
 5. Wait for Gradle sync to complete (downloads dependencies)
 
@@ -311,6 +311,6 @@ Once setup is complete:
 ## Support
 
 If you encounter issues not covered here:
-- Check [GitHub Issues](https://github.com/Brador82/Mobile_Invoice_OCR/issues)
+- Check [GitHub Issues](https://github.com/Brador82/Mobile-Invoice-Assistant/issues)
 - Review Android Studio Build Output for error details
 - Enable verbose Gradle logging: `./gradlew assembleDebug --info`
