@@ -216,3 +216,5 @@ tools/*.jpeg
 # Desktop.ini files
 desktop.ini
 **/desktop.ini
+Mobile_Invoice_ocr.zip  
+*.zip 

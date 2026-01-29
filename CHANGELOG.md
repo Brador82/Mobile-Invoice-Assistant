@@ -5,6 +5,26 @@ All notable changes to Mobile Invoice OCR will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.2] - 2026-01-29
+
+### Added
+- 🎨 **App Icon Design System**: Professional branding and icon generation
+  - Created `ICON_DESIGN_GUIDE.md` with complete design specifications
+  - Python script `tools/generate_icon.py` for automated icon generation
+  - Generates all Android icon sizes (48px to 192px) plus 512px Play Store icon
+  - "Smart Delivery Scanner" design concept: invoice + delivery truck + OCR scan lines
+  - Blue gradient background (#1565C0 → #2196F3) with orange accents (#FF9800)
+  - 4 generation methods documented: Figma, Canva, Android Asset Studio, AI prompts
+  - Installation batch script for easy deployment to Android resource folders
+  - Rounded square shape with 22% corner radius for modern look
+  - Adaptive design works on light and dark launcher backgrounds
+
+### Changed
+- 📝 **Brand Identity**: Moved from generic Android icon to professional custom design
+  - Visual elements instantly communicate app purpose (invoices + delivery)
+  - Orange scan lines represent OCR/smart processing capability
+  - Professional appearance suitable for Play Store publishing
+
 ## [1.2.1] - 2026-01-23
 
 ### Fixed
