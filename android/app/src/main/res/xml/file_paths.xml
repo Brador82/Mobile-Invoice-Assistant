@@ -2,6 +2,8 @@
 <paths>
     <external-files-path name="invoice_images" path="invoices/" />
     <external-files-path name="exports" path="exports/" />
+    <external-path name="external_downloads" path="Download/" />
+    <external-path name="external_storage" path="." />
     <files-path name="internal_images" path="images/" />
     <cache-path name="cache" path="." />
 </paths>

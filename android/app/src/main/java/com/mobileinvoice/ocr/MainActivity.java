@@ -1,24 +1,36 @@
 package com.mobileinvoice.ocr;
 
 import android.Manifest;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.exifinterface.media.ExifInterface;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.mobileinvoice.ocr.database.Invoice;
 import com.mobileinvoice.ocr.database.InvoiceDatabase;
 import com.mobileinvoice.ocr.databinding.ActivityMainBinding;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements InvoiceAdapter.OnInvoiceClickListener {
     private ActivityMainBinding binding;
@@ -57,11 +69,15 @@ public class MainActivity extends AppCompatActivity implements InvoiceAdapter.On
             new ActivityResultContracts.GetMultipleContents(),
             uris -> {
                 if (uris != null && !uris.isEmpty()) {
-                    selectedImages.addAll(uris);
-                    binding.tvStatus.setText("Selected " + selectedImages.size() + " images");
-                    binding.btnProcessOCR.setEnabled(true);
+                    // Rotate images if needed and add to list
+                    for (Uri uri : uris) {
+                        Uri correctedUri = rotateImageIfNeeded(uri);
+                        selectedImages.add(correctedUri);
+                    }
+                    updateImageCount();
+                    binding.btnClearQueue.setVisibility(android.view.View.VISIBLE);
                     binding.imagePreviewRecycler.setVisibility(android.view.View.VISIBLE);
-                    Toast.makeText(this, "Selected " + uris.size() + " images", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Selected " + uris.size() + " images (rotation corrected)", Toast.LENGTH_SHORT).show();
                 }
             }
         );
@@ -73,11 +89,13 @@ public class MainActivity extends AppCompatActivity implements InvoiceAdapter.On
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                     Uri imageUri = result.getData().getData();
                     if (imageUri != null) {
-                        selectedImages.add(imageUri);
-                        binding.tvStatus.setText("Selected " + selectedImages.size() + " images");
-                        binding.btnProcessOCR.setEnabled(true);
+                        // Rotate image if needed before adding to list
+                        Uri correctedUri = rotateImageIfNeeded(imageUri);
+                        selectedImages.add(correctedUri);
+                        updateImageCount();
+                        binding.btnClearQueue.setVisibility(android.view.View.VISIBLE);
                         binding.imagePreviewRecycler.setVisibility(android.view.View.VISIBLE);
-                        Toast.makeText(this, "Photo captured!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Photo captured and corrected!", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -109,6 +127,23 @@ public class MainActivity extends AppCompatActivity implements InvoiceAdapter.On
                 openCamera();
             } else {
                 requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA);
+            }
+        });
+        
+        // Clear Queue button - manually clear selected images before processing
+        binding.btnClearQueue.setOnClickListener(v -> {
+            if (!selectedImages.isEmpty()) {
+                new android.app.AlertDialog.Builder(this)
+                    .setTitle("Clear Image Queue?")
+                    .setMessage("This will clear " + selectedImages.size() + " selected image(s) that haven't been processed yet.")
+                    .setPositiveButton("Clear", (dialog, which) -> {
+                        selectedImages.clear();
+                        updateImageCount();
+                        binding.btnClearQueue.setVisibility(android.view.View.GONE);
+                        Toast.makeText(this, "Image queue cleared", Toast.LENGTH_SHORT).show();
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
             }
         });
         
@@ -176,12 +211,17 @@ public class MainActivity extends AppCompatActivity implements InvoiceAdapter.On
                     binding.tvStatus.setText("Processing complete! " + invoices.size() + " invoices extracted.");
                     invoiceAdapter.setInvoices(invoices);
                     updateRecordCount();
+                    
+                    // Clear the selected images queue to prevent duplicates
+                    selectedImages.clear();
+                    updateImageCount();
+                    
                     Toast.makeText(this, "OCR processing completed", Toast.LENGTH_SHORT).show();
                 });
             }).start();
         });
         
-        // Export button - now exports delivery cards
+        // Export button - now exports as HTML ZIP (recommended for delivery drivers)
         binding.btnExportCSV.setOnClickListener(v -> {
             if (invoices.isEmpty()) {
                 Toast.makeText(this, "No invoices to export", Toast.LENGTH_SHORT).show();
@@ -194,12 +234,12 @@ public class MainActivity extends AppCompatActivity implements InvoiceAdapter.On
             new Thread(() -> {
                 List<Invoice> exportInvoices = database.invoiceDao().getAllInvoicesSync();
                 runOnUiThread(() -> {
-                    exportHelper.exportToCardFolders(exportInvoices);
+                    exportHelper.exportToHTMLZip(exportInvoices);
                 });
             }).start();
         });
 
-        // Export as Markdown button
+        // Export as Markdown button (legacy)
         binding.btnExportMarkdown.setOnClickListener(v -> {
             if (invoices.isEmpty()) {
                 Toast.makeText(this, "No invoices to export", Toast.LENGTH_SHORT).show();
@@ -302,6 +342,16 @@ public class MainActivity extends AppCompatActivity implements InvoiceAdapter.On
         binding.tvRecordCount.setText(countText);
     }
     
+    private void updateImageCount() {
+        if (selectedImages.isEmpty()) {
+            binding.tvStatus.setText("Ready. Upload or capture invoice images.");
+            binding.btnProcessOCR.setEnabled(false);
+        } else {
+            binding.tvStatus.setText("Selected " + selectedImages.size() + " images");
+            binding.btnProcessOCR.setEnabled(true);
+        }
+    }
+    
     private void loadInvoicesFromDatabase() {
         new Thread(() -> {
             List<Invoice> dbInvoices = database.invoiceDao().getAllInvoicesSync();
@@ -392,5 +442,101 @@ public class MainActivity extends AppCompatActivity implements InvoiceAdapter.On
             .setNegativeButton("Cancel", null)
             .setIcon(android.R.drawable.ic_dialog_alert)
             .show();
+    }
+    
+    /**
+     * Rotate image based on EXIF orientation data
+     * Returns a new URI pointing to the corrected image
+     */
+    private Uri rotateImageIfNeeded(Uri sourceUri) {
+        try {
+            // Load bitmap from URI
+            InputStream inputStream = getContentResolver().openInputStream(sourceUri);
+            Bitmap originalBitmap = BitmapFactory.decodeStream(inputStream);
+            inputStream.close();
+            
+            if (originalBitmap == null) {
+                android.util.Log.e("MainActivity", "Failed to load bitmap from URI");
+                return sourceUri; // Return original if we can't load it
+            }
+            
+            int rotation = 0;
+            
+            // FORCE rotate landscape images to portrait (for invoice OCR)
+            if (originalBitmap.getWidth() > originalBitmap.getHeight()) {
+                android.util.Log.d("MainActivity", "Image is landscape, forcing 90° CCW rotation for invoices");
+                rotation = -90; // Negative = counterclockwise
+            } else {
+                // Read EXIF orientation for portrait images
+                InputStream exifStream = getContentResolver().openInputStream(sourceUri);
+                ExifInterface exif = new ExifInterface(exifStream);
+                int orientation = exif.getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL
+                );
+                exifStream.close();
+                
+                // Calculate rotation angle from EXIF
+                switch (orientation) {
+                    case ExifInterface.ORIENTATION_ROTATE_90:
+                        rotation = 90;
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_180:
+                        rotation = 180;
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_270:
+                        rotation = 270;
+                        break;
+                    case ExifInterface.ORIENTATION_NORMAL:
+                    default:
+                        // No rotation needed
+                        break;
+                }
+            }
+            
+            // If no rotation needed, return original
+            if (rotation == 0) {
+                android.util.Log.d("MainActivity", "Image already properly oriented");
+                originalBitmap.recycle();
+                return sourceUri;
+            }
+            
+            android.util.Log.d("MainActivity", "Rotating image by " + rotation + " degrees");
+            
+            // Apply rotation
+            Matrix matrix = new Matrix();
+            matrix.postRotate(rotation);
+            Bitmap rotatedBitmap = Bitmap.createBitmap(
+                originalBitmap, 0, 0,
+                originalBitmap.getWidth(), originalBitmap.getHeight(),
+                matrix, true
+            );
+            originalBitmap.recycle();
+            
+            // Save rotated bitmap to a new file in app's private storage
+            File imagesDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Invoices");
+            if (!imagesDir.exists()) {
+                imagesDir.mkdirs();
+            }
+            
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+            File rotatedFile = new File(imagesDir, "IMG_" + timestamp + "_corrected.jpg");
+            
+            FileOutputStream fos = new FileOutputStream(rotatedFile);
+            rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 95, fos);
+            fos.flush();
+            fos.close();
+            rotatedBitmap.recycle();
+            
+            android.util.Log.d("MainActivity", "Saved rotated image to: " + rotatedFile.getAbsolutePath());
+            
+            // Return URI for the corrected image
+            return Uri.fromFile(rotatedFile);
+            
+        } catch (Exception e) {
+            android.util.Log.e("MainActivity", "Error rotating image: " + e.getMessage());
+            e.printStackTrace();
+            return sourceUri; // Return original if rotation fails
+        }
     }
 }

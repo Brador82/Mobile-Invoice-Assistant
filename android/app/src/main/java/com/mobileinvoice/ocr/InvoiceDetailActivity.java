@@ -228,6 +228,26 @@ public class InvoiceDetailActivity extends AppCompatActivity {
     private void setupClickListeners() {
         binding.btnCaptureSignature.setOnClickListener(v -> {
             Intent intent = new Intent(this, SignatureActivity.class);
+            // Pass the original invoice image path to show as background
+            if (currentInvoice != null && currentInvoice.getOriginalImagePath() != null) {
+                String imagePath = currentInvoice.getOriginalImagePath();
+                android.util.Log.d("InvoiceDetail", "Passing image path to signature: " + imagePath);
+                intent.putExtra("invoice_image_path", imagePath);
+                
+                // Grant URI permission if it's a content:// URI
+                if (imagePath.startsWith("content://")) {
+                    intent.setData(android.net.Uri.parse(imagePath));
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    android.util.Log.d("InvoiceDetail", "Granted READ permission for content URI");
+                }
+            } else {
+                android.util.Log.d("InvoiceDetail", "No invoice image path available");
+                if (currentInvoice == null) {
+                    android.util.Log.d("InvoiceDetail", "currentInvoice is null");
+                } else {
+                    android.util.Log.d("InvoiceDetail", "originalImagePath is null");
+                }
+            }
             signatureLauncher.launch(intent);
         });
         

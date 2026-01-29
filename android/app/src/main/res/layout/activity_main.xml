@@ -97,6 +97,17 @@
                         android:enabled="false"
                         android:layout_marginTop="8dp" />
 
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnClearQueue"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="🗑️ Clear Queue"
+                        android:textColor="#D32F2F"
+                        android:visibility="gone"
+                        android:layout_marginTop="4dp" />
+
                     <ProgressBar
                         android:id="@+id/progressBar"
                         style="?android:attr/progressBarStyleHorizontal"

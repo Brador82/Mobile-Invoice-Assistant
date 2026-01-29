@@ -5,6 +5,34 @@ All notable changes to Mobile Invoice OCR will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2026-01-23
+
+### Fixed
+- 🐛 **OCR Quality Restored**: Fixed overly strict filtering that degraded extraction quality by ~90%
+  - Relaxed item normalization to capture products with "MODEL", "SERIAL", "PRICE" in names
+  - Expanded coordinate search zones (5-10% wider) for better field detection
+  - Fixed image rotation bug that could cause double-rotation (EXIF + landscape detection)
+  - Added adaptive positioning based on "BILL TO:" and customer name markers
+  - Enhanced initialization and extraction logging for debugging
+
+### Changed
+- 📝 **Item Filtering Logic**: Now allows items with model numbers and detailed product descriptions
+  - Maximum item length: 30 → 80 characters (supports full product names)
+  - Filter patterns changed from `.contains()` to `.matches()` for precision
+  - Captures items with appliance keywords even if format varies
+  - Philosophy: Better to capture extra items than miss valid ones
+  
+- 📝 **Coordinate Extraction Zones**: Made more flexible and adaptive
+  - Customer name: 15-40% vertical (was 20-35%), 65% width (was 60%)
+  - Address: 25-55% vertical (was 30-50%), adaptive positioning below name
+  - Phone: 30-60% vertical (was 35-55%), 65% width (was 60%)
+  - Added `findMarkerY()` helper for dynamic positioning
+  
+- 📝 **Image Rotation**: Improved handling to prevent over-correction
+  - Checks EXIF orientation data first
+  - Only auto-rotates landscape images if NO EXIF data present
+  - Logs all rotation decisions for debugging
+
 ## [1.2.0] - 2026-01-15
 
 ### Fixed

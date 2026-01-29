@@ -360,9 +360,9 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
     }
     
     private void optimizeRouteFromDefaultLocation() {
-        // Default warehouse location (update with your actual starting point)
-        double defaultLat = 41.8781; // Chicago, IL (example)
-        double defaultLng = -87.6298;
+        // Default warehouse location: 1517 West Battlefield Rd., Springfield, MO 65807
+        double defaultLat = 37.1819; // Springfield, MO warehouse
+        double defaultLng = -93.3147;
         optimizeAndDisplayRoute(defaultLat, defaultLng);
     }
     

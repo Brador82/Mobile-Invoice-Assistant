@@ -3,14 +3,18 @@ package com.mobileinvoice.ocr;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
+import android.util.Base64;
 import android.widget.Toast;
 import androidx.core.content.FileProvider;
 import com.mobileinvoice.ocr.database.Invoice;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -19,6 +23,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class ExportHelper {
     private final Context context;
@@ -99,6 +105,396 @@ public class ExportHelper {
                 callback.onExportComplete(exportDir, invoices.size());
             }
         }
+    }
+
+    /**
+     * Export invoices to HTML with embedded Base64 images, zipped and ready to share
+     * This is the recommended export method for delivery drivers
+     */
+    public void exportToHTMLZip(List<Invoice> invoices) {
+        if (invoices == null || invoices.isEmpty()) {
+            Toast.makeText(context, "No invoices to export", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            // Create folder structure: Delivery_Docket_MM-DD-YYYY
+            String dateFolder = new SimpleDateFormat("'Delivery_Docket_'MM-dd-yyyy", Locale.US).format(new Date());
+            File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            File mainExportDir = new File(downloadsDir, "MobileInvoiceOCR");
+            File deliveryDir = new File(mainExportDir, dateFolder);
+            
+            if (!deliveryDir.exists()) {
+                deliveryDir.mkdirs();
+            }
+
+            int successCount = 0;
+
+            // Generate individual HTML files for each customer
+            for (Invoice invoice : invoices) {
+                try {
+                    String htmlContent = generateHTMLDeliveryCard(invoice);
+                    String filename = sanitizeFilename(invoice.getCustomerName() + "_" + invoice.getInvoiceNumber()) + ".html";
+                    File htmlFile = new File(deliveryDir, filename);
+                    
+                    FileOutputStream fos = new FileOutputStream(htmlFile);
+                    fos.write(htmlContent.getBytes("UTF-8"));
+                    fos.close();
+                    
+                    successCount++;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (successCount > 0) {
+                // Create summary index.html
+                String indexHTML = generateIndexHTML(invoices);
+                File indexFile = new File(deliveryDir, "index.html");
+                FileOutputStream fos = new FileOutputStream(indexFile);
+                fos.write(indexHTML.getBytes("UTF-8"));
+                fos.close();
+
+                // ZIP the entire folder
+                String zipFilename = dateFolder + ".zip";
+                File zipFile = new File(mainExportDir, zipFilename);
+                zipFolder(deliveryDir, zipFile);
+
+                // Show success and offer sharing options
+                showShareDialog(zipFile, successCount);
+
+                // Trigger callback for cleanup dialog
+                if (callback != null) {
+                    callback.onExportComplete(zipFile, successCount);
+                }
+            } else {
+                Toast.makeText(context, "Failed to export delivery cards", Toast.LENGTH_SHORT).show();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(context, "Error during export: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    /**
+     * Generate HTML delivery card with embedded images
+     */
+    private String generateHTMLDeliveryCard(Invoice invoice) {
+        StringBuilder html = new StringBuilder();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm a", Locale.US);
+
+        html.append("<!DOCTYPE html>\n<html>\n<head>\n");
+        html.append("<meta charset='UTF-8'>\n");
+        html.append("<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n");
+        html.append("<title>Delivery Card - ").append(escapeHTML(invoice.getCustomerName())).append("</title>\n");
+        html.append("<style>\n");
+        html.append("body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; background: #f5f5f5; }\n");
+        html.append(".card { background: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }\n");
+        html.append("h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }\n");
+        html.append("h2 { color: #34495e; margin-top: 30px; }\n");
+        html.append(".info-grid { display: grid; grid-template-columns: 150px 1fr; gap: 15px; margin: 20px 0; }\n");
+        html.append(".label { font-weight: bold; color: #7f8c8d; }\n");
+        html.append(".value { color: #2c3e50; }\n");
+        html.append(".image-section { margin: 30px 0; }\n");
+        html.append(".image-section img { max-width: 100%; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin: 10px 0; }\n");
+        html.append(".footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #ecf0f1; text-align: center; color: #95a5a6; font-size: 12px; }\n");
+        html.append("@media print { body { background: white; } .card { box-shadow: none; } }\n");
+        html.append("</style>\n</head>\n<body>\n");
+        
+        html.append("<div class='card'>\n");
+        html.append("<h1>🚚 Delivery Card</h1>\n");
+        
+        // Customer Information
+        html.append("<div class='info-grid'>\n");
+        html.append("<div class='label'>Invoice #:</div><div class='value'>").append(escapeHTML(invoice.getInvoiceNumber())).append("</div>\n");
+        html.append("<div class='label'>Customer:</div><div class='value'>").append(escapeHTML(invoice.getCustomerName())).append("</div>\n");
+        html.append("<div class='label'>Address:</div><div class='value'>").append(escapeHTML(invoice.getAddress())).append("</div>\n");
+        html.append("<div class='label'>Phone:</div><div class='value'>").append(escapeHTML(invoice.getPhone())).append("</div>\n");
+        html.append("<div class='label'>Date/Time:</div><div class='value'>").append(dateFormat.format(new Date(invoice.getTimestamp()))).append("</div>\n");
+        html.append("<div class='label'>Items:</div><div class='value'>").append(escapeHTML(invoice.getItems())).append("</div>\n");
+        if (invoice.getNotes() != null && !invoice.getNotes().isEmpty()) {
+            html.append("<div class='label'>Notes:</div><div class='value'>").append(escapeHTML(invoice.getNotes())).append("</div>\n");
+        }
+        html.append("</div>\n");
+        
+        // Original Invoice Image
+        if (invoice.getOriginalImagePath() != null && !invoice.getOriginalImagePath().isEmpty()) {
+            String base64 = imageToBase64(invoice.getOriginalImagePath());
+            if (base64 != null) {
+                html.append("<h2>📄 Original Invoice</h2>\n");
+                html.append("<div class='image-section'>\n");
+                html.append("<img src='data:image/jpeg;base64,").append(base64).append("' alt='Original Invoice'>\n");
+                html.append("</div>\n");
+            }
+        }
+        
+        // POD Photos
+        boolean hasPOD = false;
+        String[] podPaths = {invoice.getPodImagePath1(), invoice.getPodImagePath2(), invoice.getPodImagePath3()};
+        for (int i = 0; i < podPaths.length; i++) {
+            if (podPaths[i] != null && !podPaths[i].isEmpty()) {
+                if (!hasPOD) {
+                    html.append("<h2>📷 Proof of Delivery Photos</h2>\n");
+                    html.append("<div class='image-section'>\n");
+                    hasPOD = true;
+                }
+                String base64 = imageToBase64(podPaths[i]);
+                if (base64 != null) {
+                    html.append("<h3>Photo ").append(i + 1).append("</h3>\n");
+                    html.append("<img src='data:image/jpeg;base64,").append(base64).append("' alt='POD Photo ").append(i + 1).append("'>\n");
+                }
+            }
+        }
+        if (hasPOD) {
+            html.append("</div>\n");
+        }
+        
+        // Signature
+        if (invoice.getSignatureImagePath() != null && !invoice.getSignatureImagePath().isEmpty()) {
+            String base64 = imageToBase64(invoice.getSignatureImagePath());
+            if (base64 != null) {
+                html.append("<h2>✍️ Customer Signature</h2>\n");
+                html.append("<div class='image-section'>\n");
+                html.append("<img src='data:image/jpeg;base64,").append(base64).append("' alt='Signature'>\n");
+                html.append("</div>\n");
+            }
+        }
+        
+        // Footer
+        html.append("<div class='footer'>\n");
+        html.append("<p>Generated by Mobile Invoice OCR App<br>");
+        html.append("Export Date: ").append(new SimpleDateFormat("MM/dd/yyyy hh:mm a", Locale.US).format(new Date())).append("</p>\n");
+        html.append("</div>\n");
+        
+        html.append("</div>\n</body>\n</html>");
+        
+        return html.toString();
+    }
+
+    /**
+     * Generate index HTML with list of all deliveries
+     */
+    private String generateIndexHTML(List<Invoice> invoices) {
+        StringBuilder html = new StringBuilder();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
+
+        html.append("<!DOCTYPE html>\n<html>\n<head>\n");
+        html.append("<meta charset='UTF-8'>\n");
+        html.append("<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n");
+        html.append("<title>Delivery Docket - ").append(dateFormat.format(new Date())).append("</title>\n");
+        html.append("<style>\n");
+        html.append("body { font-family: Arial, sans-serif; max-width: 1000px; margin: 20px auto; padding: 20px; background: #f5f5f5; }\n");
+        html.append(".header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 8px; margin-bottom: 30px; }\n");
+        html.append("h1 { margin: 0; }\n");
+        html.append(".summary { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }\n");
+        html.append(".delivery-list { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }\n");
+        html.append(".delivery-item { padding: 20px; border-bottom: 1px solid #ecf0f1; }\n");
+        html.append(".delivery-item:hover { background: #f8f9fa; }\n");
+        html.append(".delivery-item:last-child { border-bottom: none; }\n");
+        html.append(".delivery-number { font-size: 24px; font-weight: bold; color: #3498db; }\n");
+        html.append(".customer-name { font-size: 18px; margin: 10px 0; }\n");
+        html.append(".details { color: #7f8c8d; font-size: 14px; }\n");
+        html.append("a { color: #3498db; text-decoration: none; font-weight: bold; }\n");
+        html.append("a:hover { text-decoration: underline; }\n");
+        html.append(".stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }\n");
+        html.append(".stat-box { text-align: center; padding: 15px; background: #ecf0f1; border-radius: 4px; }\n");
+        html.append(".stat-number { font-size: 32px; font-weight: bold; color: #2c3e50; }\n");
+        html.append(".stat-label { color: #7f8c8d; font-size: 14px; }\n");
+        html.append("</style>\n</head>\n<body>\n");
+        
+        html.append("<div class='header'>\n");
+        html.append("<h1>📦 Delivery Docket</h1>\n");
+        html.append("<p>Date: ").append(dateFormat.format(new Date())).append("</p>\n");
+        html.append("</div>\n");
+        
+        // Summary Statistics
+        int totalInvoices = invoices.size();
+        int withPOD = 0;
+        int withSignature = 0;
+        
+        for (Invoice inv : invoices) {
+            if ((inv.getPodImagePath1() != null && !inv.getPodImagePath1().isEmpty()) ||
+                (inv.getPodImagePath2() != null && !inv.getPodImagePath2().isEmpty()) ||
+                (inv.getPodImagePath3() != null && !inv.getPodImagePath3().isEmpty())) {
+                withPOD++;
+            }
+            if (inv.getSignatureImagePath() != null && !inv.getSignatureImagePath().isEmpty()) {
+                withSignature++;
+            }
+        }
+        
+        html.append("<div class='summary'>\n");
+        html.append("<h2>Summary</h2>\n");
+        html.append("<div class='stats'>\n");
+        html.append("<div class='stat-box'><div class='stat-number'>").append(totalInvoices).append("</div><div class='stat-label'>Total Deliveries</div></div>\n");
+        html.append("<div class='stat-box'><div class='stat-number'>").append(withPOD).append("</div><div class='stat-label'>With POD Photos</div></div>\n");
+        html.append("<div class='stat-box'><div class='stat-number'>").append(withSignature).append("</div><div class='stat-label'>With Signatures</div></div>\n");
+        html.append("</div>\n</div>\n");
+        
+        // Delivery List
+        html.append("<div class='delivery-list'>\n");
+        for (int i = 0; i < invoices.size(); i++) {
+            Invoice inv = invoices.get(i);
+            String filename = sanitizeFilename(inv.getCustomerName() + "_" + inv.getInvoiceNumber()) + ".html";
+            
+            html.append("<div class='delivery-item'>\n");
+            html.append("<div class='delivery-number'>#").append(i + 1).append(" - ").append(escapeHTML(inv.getInvoiceNumber())).append("</div>\n");
+            html.append("<div class='customer-name'>").append(escapeHTML(inv.getCustomerName())).append("</div>\n");
+            html.append("<div class='details'>").append(escapeHTML(inv.getAddress())).append("</div>\n");
+            html.append("<div class='details'>").append(escapeHTML(inv.getPhone())).append(" • Items: ").append(escapeHTML(inv.getItems())).append("</div>\n");
+            html.append("<div style='margin-top: 10px;'><a href='").append(filename).append("'>View Delivery Card →</a></div>\n");
+            html.append("</div>\n");
+        }
+        html.append("</div>\n");
+        
+        html.append("</body>\n</html>");
+        return html.toString();
+    }
+
+    /**
+     * Convert image file to Base64 string
+     */
+    private String imageToBase64(String imagePath) {
+        try {
+            File imageFile = new File(imagePath);
+            if (!imageFile.exists()) return null;
+            
+            // Load and compress image if it's too large
+            Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
+            if (bitmap == null) return null;
+            
+            // Resize if image is very large (to keep HTML file size reasonable)
+            int maxDimension = 1200;
+            if (bitmap.getWidth() > maxDimension || bitmap.getHeight() > maxDimension) {
+                float scale = Math.min((float) maxDimension / bitmap.getWidth(), (float) maxDimension / bitmap.getHeight());
+                int newWidth = Math.round(bitmap.getWidth() * scale);
+                int newHeight = Math.round(bitmap.getHeight() * scale);
+                bitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
+            }
+            
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 85, baos);
+            byte[] imageBytes = baos.toByteArray();
+            
+            bitmap.recycle();
+            return Base64.encodeToString(imageBytes, Base64.NO_WRAP);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * ZIP an entire folder
+     */
+    private void zipFolder(File sourceFolder, File zipFile) throws IOException {
+        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFile));
+        zipFolderRecursive(sourceFolder, sourceFolder.getName(), zos);
+        zos.close();
+    }
+
+    /**
+     * Recursively zip folder contents
+     */
+    private void zipFolderRecursive(File folder, String parentPath, ZipOutputStream zos) throws IOException {
+        File[] files = folder.listFiles();
+        if (files == null) return;
+        
+        for (File file : files) {
+            if (file.isDirectory()) {
+                zipFolderRecursive(file, parentPath + "/" + file.getName(), zos);
+            } else {
+                FileInputStream fis = new FileInputStream(file);
+                ZipEntry zipEntry = new ZipEntry(parentPath + "/" + file.getName());
+                zos.putNextEntry(zipEntry);
+                
+                byte[] buffer = new byte[1024];
+                int length;
+                while ((length = fis.read(buffer)) > 0) {
+                    zos.write(buffer, 0, length);
+                }
+                
+                zos.closeEntry();
+                fis.close();
+            }
+        }
+    }
+
+    /**
+     * Show share dialog after successful export
+     */
+    private void showShareDialog(File zipFile, int invoiceCount) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("✓ Export Complete");
+        builder.setMessage("Successfully exported " + invoiceCount + " delivery cards.\n\n" +
+                          "File: " + zipFile.getName() + "\n" +
+                          "Size: " + (zipFile.length() / 1024) + " KB\n\n" +
+                          "How would you like to share this?");
+        
+        builder.setPositiveButton("Share Now", (dialog, which) -> {
+            shareZipFile(zipFile);
+        });
+        
+        builder.setNeutralButton("View Location", (dialog, which) -> {
+            Toast.makeText(context, "Saved to:\n" + zipFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
+        });
+        
+        builder.setNegativeButton("Done", null);
+        builder.show();
+    }
+
+    /**
+     * Share ZIP file using Android share sheet
+     */
+    private void shareZipFile(File zipFile) {
+        try {
+            Uri zipUri = FileProvider.getUriForFile(
+                context,
+                context.getPackageName() + ".fileprovider",
+                zipFile
+            );
+            
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("application/zip");
+            shareIntent.putExtra(Intent.EXTRA_STREAM, zipUri);
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Delivery Docket - " + new SimpleDateFormat("MM/dd/yyyy", Locale.US).format(new Date()));
+            shareIntent.putExtra(Intent.EXTRA_TEXT, "Attached delivery docket with " + zipFile.getName());
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            
+            context.startActivity(Intent.createChooser(shareIntent, "Share Delivery Docket"));
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(context, "Error sharing file: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Sanitize filename for safe file system use
+     */
+    private String sanitizeFilename(String filename) {
+        if (filename == null) return "Unknown";
+        // Remove or replace invalid characters
+        String safe = filename.replaceAll("[^a-zA-Z0-9\\-_]", "_");
+        // Limit length
+        if (safe.length() > 50) {
+            safe = safe.substring(0, 50);
+        }
+        return safe;
+    }
+
+    /**
+     * Escape HTML special characters
+     */
+    private String escapeHTML(String value) {
+        if (value == null) return "";
+        return value.replace("&", "&amp;")
+                   .replace("<", "&lt;")
+                   .replace(">", "&gt;")
+                   .replace("\"", "&quot;")
+                   .replace("'", "&#39;");
     }
 
     // Helper for Markdown escaping

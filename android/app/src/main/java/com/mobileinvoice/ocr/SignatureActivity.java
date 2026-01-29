@@ -26,6 +26,16 @@ public class SignatureActivity extends AppCompatActivity {
         
         signatureView = binding.signatureCanvas;
         
+        // Load invoice image as background if provided
+        String invoiceImagePath = getIntent().getStringExtra("invoice_image_path");
+        android.util.Log.d("SignatureActivity", "Received image path: " + invoiceImagePath);
+        
+        if (invoiceImagePath != null) {
+            signatureView.setBackgroundImage(invoiceImagePath);
+        } else {
+            android.util.Log.d("SignatureActivity", "No image path received");
+        }
+        
         setupToolbar();
         setupButtons();
     }
