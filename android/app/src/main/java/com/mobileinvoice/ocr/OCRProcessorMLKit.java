@@ -37,9 +37,20 @@ public class OCRProcessorMLKit {
         "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
     );
     
-    // Matches: RX1P2204, JWA1220F, A4L/Serial#, INV-12345
-    private static final Pattern INVOICE_NUMBER_PATTERN = Pattern.compile(
-        "\\b([A-Z]{2,3}\\d[A-Z]?\\d{4}[A-Z]?|A4L/Serial#|INV[-]?\\d+|#\\s*\\d+)\\b"
+    // Matches labeled invoice numbers: "Invoice #12345", "Order #12345", "INV-12345"
+    private static final Pattern LABELED_INVOICE_PATTERN = Pattern.compile(
+        "(?i)(?:invoice|order|inv|ref)\\s*[#:.-]?\\s*(\\d{4,8})",
+        Pattern.CASE_INSENSITIVE
+    );
+
+    // Matches specific invoice formats: RX1P2204, JWA1220F (but NOT zip codes like 65807)
+    private static final Pattern INVOICE_CODE_PATTERN = Pattern.compile(
+        "\\b([A-Z]{2}\\d[A-Z]\\d{4}[A-Z]?)\\b"  // Must have letter after first digit (e.g., RX1P2204)
+    );
+
+    // Zip code pattern to exclude from invoice number matching
+    private static final Pattern ZIP_CODE_PATTERN = Pattern.compile(
+        "\\b\\d{5}(?:-\\d{4})?\\b"
     );
     
     // Patterns for cleaning customer name
@@ -387,19 +398,72 @@ public class OCRProcessorMLKit {
     
     /**
      * Extract invoice number from header area
-     * Looks for patterns like: RX1P2202, INV-12345, #12345
+     * Priority: 1) Labeled invoice numbers, 2) Invoice code patterns
+     * Excludes: Zip codes, address content
      */
     private String extractInvoiceNumber(List<String> lines) {
-        // Check first 10 lines for invoice number
-        for (int i = 0; i < Math.min(10, lines.size()); i++) {
+        // Skip lines that are clearly address content
+        List<String> headerLines = new ArrayList<>();
+        for (int i = 0; i < Math.min(15, lines.size()); i++) {
             String line = lines.get(i);
-            
-            Matcher matcher = INVOICE_NUMBER_PATTERN.matcher(line);
-            if (matcher.find()) {
-                return matcher.group(1);
+            String lower = line.toLowerCase();
+
+            // Skip address-related lines
+            if (lower.contains("address:") || lower.contains("bill to") ||
+                lower.contains("missouri") || lower.contains("springfield") ||
+                lower.contains("street") || lower.contains("avenue") ||
+                lower.contains("road") || lower.contains("drive") ||
+                lower.contains("city") || lower.contains("state")) {
+                continue;
+            }
+
+            headerLines.add(line);
+        }
+
+        // First priority: Look for explicitly labeled invoice numbers
+        for (String line : headerLines) {
+            Matcher labeledMatcher = LABELED_INVOICE_PATTERN.matcher(line);
+            if (labeledMatcher.find()) {
+                String invoiceNum = labeledMatcher.group(1);
+                // Verify it's not a zip code
+                if (!ZIP_CODE_PATTERN.matcher(invoiceNum).matches() || invoiceNum.length() > 5) {
+                    Log.d(TAG, "Found labeled invoice number: " + invoiceNum);
+                    return invoiceNum;
+                }
             }
         }
-        
+
+        // Second priority: Look for invoice code patterns (e.g., RX1P2204)
+        for (String line : headerLines) {
+            Matcher codeMatcher = INVOICE_CODE_PATTERN.matcher(line);
+            if (codeMatcher.find()) {
+                String invoiceCode = codeMatcher.group(1);
+                Log.d(TAG, "Found invoice code: " + invoiceCode);
+                return invoiceCode;
+            }
+        }
+
+        // Third priority: Look for any standalone number that looks like an invoice (6+ digits)
+        Pattern standaloneNumber = Pattern.compile("\\b(\\d{6,10})\\b");
+        for (String line : headerLines) {
+            // Skip if line contains state names or address keywords
+            if (line.toLowerCase().contains("phone") || line.toLowerCase().contains("email")) {
+                continue;
+            }
+
+            Matcher numMatcher = standaloneNumber.matcher(line);
+            if (numMatcher.find()) {
+                String num = numMatcher.group(1);
+                // Exclude if it looks like a phone number (10 digits starting with common area codes)
+                if (num.length() == 10 && (num.startsWith("417") || num.startsWith("573") ||
+                    num.startsWith("816") || num.startsWith("314"))) {
+                    continue;
+                }
+                Log.d(TAG, "Found standalone invoice number: " + num);
+                return num;
+            }
+        }
+
         return "";
     }
     

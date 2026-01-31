@@ -6,12 +6,14 @@
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     app:cardCornerRadius="8dp"
-    app:cardElevation="2dp">
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="@android:color/transparent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:background="@drawable/gradient_card_black_white"
         android:padding="12dp">
 
         <LinearLayout
@@ -26,7 +28,8 @@
                 android:layout_weight="1"
                 android:text="INV-123456"
                 android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textColor="@color/white" />
 
             <ImageButton
                 android:id="@+id/btnDelete"
@@ -34,7 +37,8 @@
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@android:drawable/ic_menu_delete"
-                android:contentDescription="@string/delete" />
+                android:contentDescription="@string/delete"
+                app:tint="@color/white" />
         </LinearLayout>
 
         <TextView
@@ -43,6 +47,7 @@
             android:layout_height="wrap_content"
             android:text="Customer Name"
             android:textSize="14sp"
+            android:textColor="@color/white"
             android:layout_marginTop="4dp" />
 
         <TextView
@@ -51,13 +56,14 @@
             android:layout_height="wrap_content"
             android:text="Address"
             android:textSize="12sp"
-            android:textColor="@color/medium_gray"
+            android:textColor="@color/light_gray"
             android:layout_marginTop="2dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:gravity="center_vertical"
             android:layout_marginTop="8dp">
 
             <com.google.android.material.button.MaterialButton
@@ -65,7 +71,21 @@
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/view_details" />
+                android:text="@string/view_details"
+                android:textColor="@color/gold"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <CheckBox
+                android:id="@+id/cbDeliveryComplete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@drawable/ic_checkbox_gold"
+                android:contentDescription="Mark delivery complete" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

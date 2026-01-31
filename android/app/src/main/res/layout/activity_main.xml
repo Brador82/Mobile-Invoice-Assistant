@@ -90,12 +90,17 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnProcessOCR"
-                        style="@style/ButtonStyle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="🧠 Process All with OCR"
+                        android:background="@drawable/gradient_black_button"
+                        android:text="Process All with OCR"
+                        android:textColor="@color/gold"
+                        android:textStyle="bold"
                         android:enabled="false"
-                        android:layout_marginTop="8dp" />
+                        android:layout_marginTop="8dp"
+                        app:icon="@drawable/ic_scan_document"
+                        app:iconTint="@color/gold"
+                        app:backgroundTint="@null" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnClearQueue"

@@ -221,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements InvoiceAdapter.On
             }).start();
         });
         
-        // Export button - now exports as HTML ZIP (recommended for delivery drivers)
+        // Export button - exports as PDF ZIP (opens natively on any device)
         binding.btnExportCSV.setOnClickListener(v -> {
             if (invoices.isEmpty()) {
                 Toast.makeText(this, "No invoices to export", Toast.LENGTH_SHORT).show();
@@ -234,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements InvoiceAdapter.On
             new Thread(() -> {
                 List<Invoice> exportInvoices = database.invoiceDao().getAllInvoicesSync();
                 runOnUiThread(() -> {
-                    exportHelper.exportToHTMLZip(exportInvoices);
+                    exportHelper.exportToPDFZip(exportInvoices);
                 });
             }).start();
         });
@@ -396,9 +396,26 @@ public class MainActivity extends AppCompatActivity implements InvoiceAdapter.On
         // Update the main invoices list with new order
         invoices.clear();
         invoices.addAll(reorderedList);
-        
+
         // Optional: Save order to database (you could add a displayOrder field to Invoice entity)
         Toast.makeText(this, "Order updated - Long press to drag invoices", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDeliveryCompleteChanged(Invoice invoice, boolean isComplete) {
+        // Update the invoice status based on checkbox
+        String newStatus = isComplete ? "DELIVERED" : "PENDING";
+        invoice.setStatus(newStatus);
+
+        // Save to database
+        new Thread(() -> {
+            database.invoiceDao().update(invoice);
+            runOnUiThread(() -> {
+                String message = isComplete ?
+                    "Delivery marked complete!" : "Delivery marked pending";
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+            });
+        }).start();
     }
     
     /**

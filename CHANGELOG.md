@@ -5,6 +5,45 @@ All notable changes to Mobile Invoice OCR will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.3] - 2026-01-30
+
+### Added
+- 🎨 **New Black & Gold App Icon**: Premium branded icon with A4L lettering
+  - Deep glossy black background with light reflections
+  - Gold circular route arrows representing delivery optimization
+  - Cream/gold document with "A4L" branding prominently displayed
+  - Gold decorative accents and subtle grid pattern background
+  - Vector drawables for perfect scaling on all devices
+
+- ✅ **Delivery Completion Checkbox**: Track completed deliveries on main screen
+  - Gold checkmark checkbox on each delivery card (bottom-right)
+  - Tap to mark delivery as "DELIVERED"
+  - State persists to database immediately
+  - Visual feedback with toast notification
+
+- 🎨 **Enhanced UI Styling**: Premium black and gold theme
+  - "Process All with OCR" button: Black gradient background with gold border
+  - Gold scan document icon replacing brain emoji
+  - Delivery cards: Black-to-gray gradient background
+  - White text for customer name and invoice number (high contrast)
+  - Light gray address text
+  - Gold "View Details" button text
+  - Improved visibility in sunlight
+
+### Changed
+- 📝 **OCR Invoice Number Extraction**: Smarter detection to avoid address confusion
+  - Now prioritizes explicitly labeled invoice numbers ("Invoice #", "Order #")
+  - Excludes lines containing address keywords (Missouri, Springfield, street names)
+  - Filters out zip codes (5-digit patterns)
+  - Better phone number exclusion (recognizes area codes 417, 573, 816, 314)
+  - Logs extraction decisions for debugging
+
+### Fixed
+- 🐛 **Invoice Number Mis-extraction**: Fixed issue where "Missouri 65807" was picked up as invoice number
+  - Added address keyword filtering in header line processing
+  - Added zip code pattern exclusion
+  - More specific invoice code pattern matching (requires letter after first digit)
+
 ## [1.2.2] - 2026-01-29
 
 ### Added
@@ -285,6 +324,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Status | Notes |
 |---------|------|--------|-------|
+| 1.2.3 | 2026-01-30 | ✅ Released | Black/gold theme, delivery checkbox, OCR fixes |
+| 1.2.2 | 2026-01-29 | ✅ Released | Icon design system |
+| 1.2.1 | 2026-01-23 | ✅ Released | OCR quality restoration |
+| 1.2.0 | 2026-01-15 | ✅ Released | POD persistence, auto-save |
+| 1.1.0 | 2026-01-15 | ✅ Released | Route optimization, drag-drop |
 | 1.0.0 | 2026-01-11 | ✅ Released | Production-ready |
 | 0.9.0 | 2026-01-10 | 🚧 Development | Pivoted to ML Kit |
 | 0.5.0 | 2026-01-09 | 🔬 Prototype | Tesseract testing |

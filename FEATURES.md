@@ -1,6 +1,6 @@
 # ✅ Mobile Invoice OCR - Feature Implementation Checklist
 
-**Last Updated:** January 20, 2026
+**Last Updated:** January 30, 2026
 
 ## Core Features Implemented
 
@@ -20,6 +20,14 @@
   - Address whitespace normalization
   - Item filtering (excludes warranty/terms/totals)
   - Length validation (3-30 chars for items)
+- [x] **Improved Invoice Number Detection (Jan 30, 2026)**:
+  - Priority 1: Labeled invoice numbers ("Invoice #", "Order #", "INV-")
+  - Priority 2: Invoice code patterns (e.g., RX1P2204)
+  - Priority 3: Standalone 6+ digit numbers
+  - Excludes address lines (Missouri, Springfield, street names)
+  - Excludes zip codes (5-digit patterns)
+  - Excludes phone numbers (10 digits with area codes)
+  - Debug logging for extraction decisions
 - [x] Error handling and user feedback
 
 ### 📸 Image Capture & Upload (Android)
@@ -189,6 +197,38 @@
 - [x] Smooth animations and transitions
 - [x] Accessible focus states
 - [x] Print-optimized styles
+- [x] **Premium Black & Gold Theme (Jan 30, 2026)**:
+  - Black gradient buttons with gold borders
+  - Delivery cards with black-to-gray gradient
+  - White text for high contrast (sunlight readable)
+  - Gold accent colors for "View Details" and icons
+  - Custom gold scan document icon
+
+### ✅ Delivery Completion Tracking (NEW - Jan 30, 2026)
+
+- [x] **Checkbox on each delivery card** (bottom-right corner)
+- [x] **Gold checkmark** when checked (custom ic_checkbox_gold.xml)
+- [x] **Database persistence** - status saved immediately
+- [x] **Status toggle**: PENDING ↔ DELIVERED
+- [x] **Toast feedback** on state change
+- [x] **Survives app restart** - checkbox state restored from database
+
+### 🎨 App Icon & Branding (UPDATED - Jan 30, 2026)
+
+- [x] **Black & Gold Color Scheme**:
+  - Glossy black background (#0A0A0A)
+  - Gold accents (#FFD700, #D4AF37, #B8860B)
+  - Light reflection effects
+- [x] **Design Elements**:
+  - Circular gold route arrows (delivery optimization theme)
+  - Cream/gold document with fold corner
+  - "A4L" branding text on document
+  - Gold decorative line and text lines
+  - Subtle grid pattern in background
+- [x] **Vector Drawable Implementation**:
+  - ic_launcher_foreground.xml
+  - ic_launcher_background.xml
+  - Adaptive icon support (mipmap-anydpi-v26)
 
 ### 🖥️ Header & Navigation
 

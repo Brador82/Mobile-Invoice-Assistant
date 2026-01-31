@@ -20,6 +20,7 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.InvoiceV
         void onViewDetails(Invoice invoice);
         void onDelete(Invoice invoice);
         void onOrderChanged(List<Invoice> reorderedList);
+        void onDeliveryCompleteChanged(Invoice invoice, boolean isComplete);
     }
 
     public InvoiceAdapter(OnInvoiceClickListener listener) {
@@ -87,14 +88,14 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.InvoiceV
         }
 
         void bind(Invoice invoice) {
-            binding.tvInvoiceNumber.setText(invoice.getInvoiceNumber() != null ? 
+            binding.tvInvoiceNumber.setText(invoice.getInvoiceNumber() != null ?
                 invoice.getInvoiceNumber() : "INV-" + invoice.getId());
-            binding.tvCustomerName.setText(invoice.getCustomerName() != null ? 
+            binding.tvCustomerName.setText(invoice.getCustomerName() != null ?
                 invoice.getCustomerName() : "Unknown Customer");
-            
+
             String address = invoice.getAddress() != null ? invoice.getAddress() : "No address";
             binding.tvAddress.setText(address);
-            
+
             // Make address clickable to open in maps
             binding.tvAddress.setOnClickListener(v -> {
                 if (invoice.getAddress() != null && !invoice.getAddress().isEmpty()) {
@@ -106,16 +107,27 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.InvoiceV
                     }
                 }
             });
-            
+
             binding.btnViewDetails.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onViewDetails(invoice);
                 }
             });
-            
+
             binding.btnDelete.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onDelete(invoice);
+                }
+            });
+
+            // Set checkbox state based on delivery status
+            binding.cbDeliveryComplete.setOnCheckedChangeListener(null); // Clear listener first
+            binding.cbDeliveryComplete.setChecked(invoice.isCompleted());
+
+            // Handle checkbox toggle
+            binding.cbDeliveryComplete.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (listener != null) {
+                    listener.onDeliveryCompleteChanged(invoice, isChecked);
                 }
             });
         }
