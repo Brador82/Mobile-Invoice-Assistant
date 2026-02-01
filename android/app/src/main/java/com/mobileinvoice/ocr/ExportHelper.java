@@ -5,6 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.Typeface;
+import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Base64;
@@ -29,6 +35,78 @@ import java.util.zip.ZipOutputStream;
 public class ExportHelper {
     private final Context context;
     private ExportCompleteCallback callback;
+
+    // Custom AFA4L branded SVG icons - modern sleek design with black/gold gradients
+    private static final String SVG_GRADIENT_DEFS =
+        "<defs>" +
+        "<linearGradient id='goldGrad' x1='0%' y1='100%' x2='0%' y2='0%'>" +
+        "<stop offset='0%' style='stop-color:#0D0D0D'/>" +
+        "<stop offset='100%' style='stop-color:#D4AF37'/>" +
+        "</linearGradient>" +
+        "<linearGradient id='goldShine' x1='0%' y1='0%' x2='100%' y2='100%'>" +
+        "<stop offset='0%' style='stop-color:#FFD700'/>" +
+        "<stop offset='50%' style='stop-color:#D4AF37'/>" +
+        "<stop offset='100%' style='stop-color:#B8860B'/>" +
+        "</linearGradient>" +
+        "</defs>";
+
+    // Delivery truck icon with A4L branding
+    private static final String ICON_TRUCK =
+        "<svg width='32' height='32' viewBox='0 0 32 32' style='vertical-align:middle;margin-right:8px;'>" + SVG_GRADIENT_DEFS +
+        "<rect x='2' y='10' width='18' height='12' rx='2' fill='url(#goldGrad)'/>" +
+        "<path d='M20 14 L20 22 L28 22 L28 17 L24 14 Z' fill='url(#goldShine)'/>" +
+        "<rect x='21' y='15' width='5' height='4' rx='1' fill='#0D0D0D' opacity='0.7'/>" +
+        "<circle cx='8' cy='24' r='3' fill='url(#goldShine)'/><circle cx='8' cy='24' r='1.5' fill='#0D0D0D'/>" +
+        "<circle cx='24' cy='24' r='3' fill='url(#goldShine)'/><circle cx='24' cy='24' r='1.5' fill='#0D0D0D'/>" +
+        "<text x='7' y='18' font-size='6' font-weight='bold' fill='#0D0D0D' font-family='Arial'>A4L</text>" +
+        "</svg>";
+
+    // Document/invoice icon
+    private static final String ICON_DOCUMENT =
+        "<svg width='28' height='28' viewBox='0 0 28 28' style='vertical-align:middle;margin-right:8px;'>" + SVG_GRADIENT_DEFS +
+        "<path d='M6 2 L18 2 L22 6 L22 26 L6 26 Z' fill='url(#goldGrad)'/>" +
+        "<path d='M18 2 L18 6 L22 6 Z' fill='url(#goldShine)'/>" +
+        "<rect x='9' y='10' width='10' height='1.5' rx='0.5' fill='#0D0D0D' opacity='0.6'/>" +
+        "<rect x='9' y='14' width='10' height='1.5' rx='0.5' fill='#0D0D0D' opacity='0.6'/>" +
+        "<rect x='9' y='18' width='7' height='1.5' rx='0.5' fill='#0D0D0D' opacity='0.6'/>" +
+        "</svg>";
+
+    // Camera/photo icon
+    private static final String ICON_CAMERA =
+        "<svg width='28' height='28' viewBox='0 0 28 28' style='vertical-align:middle;margin-right:8px;'>" + SVG_GRADIENT_DEFS +
+        "<rect x='3' y='8' width='22' height='16' rx='3' fill='url(#goldGrad)'/>" +
+        "<rect x='10' y='4' width='8' height='4' rx='1' fill='url(#goldShine)'/>" +
+        "<circle cx='14' cy='16' r='5' fill='#0D0D0D'/>" +
+        "<circle cx='14' cy='16' r='3.5' fill='url(#goldShine)'/>" +
+        "<circle cx='14' cy='16' r='1.5' fill='#0D0D0D' opacity='0.5'/>" +
+        "<circle cx='21' y='11' r='1.5' fill='#FFD700'/>" +
+        "</svg>";
+
+    // Signature/pen icon
+    private static final String ICON_SIGNATURE =
+        "<svg width='28' height='28' viewBox='0 0 28 28' style='vertical-align:middle;margin-right:8px;'>" + SVG_GRADIENT_DEFS +
+        "<path d='M4 24 Q8 20 12 22 Q16 24 20 20 Q22 18 24 18' stroke='url(#goldShine)' stroke-width='2.5' fill='none' stroke-linecap='round'/>" +
+        "<path d='M20 4 L24 8 L12 20 L8 20 L8 16 Z' fill='url(#goldGrad)'/>" +
+        "<path d='M20 4 L24 8 L22 10 L18 6 Z' fill='url(#goldShine)'/>" +
+        "<path d='M8 20 L10 22 L8 24 L6 22 Z' fill='#D4AF37'/>" +
+        "</svg>";
+
+    // Package/box icon
+    private static final String ICON_PACKAGE =
+        "<svg width='32' height='32' viewBox='0 0 32 32' style='vertical-align:middle;margin-right:8px;'>" + SVG_GRADIENT_DEFS +
+        "<path d='M16 2 L28 8 L28 24 L16 30 L4 24 L4 8 Z' fill='url(#goldGrad)'/>" +
+        "<path d='M16 2 L28 8 L16 14 L4 8 Z' fill='url(#goldShine)'/>" +
+        "<path d='M16 14 L16 30 L4 24 L4 8 Z' fill='url(#goldGrad)' opacity='0.8'/>" +
+        "<line x1='16' y1='14' x2='16' y2='30' stroke='#FFD700' stroke-width='1'/>" +
+        "<line x1='4' y1='8' x2='16' y2='14' stroke='#FFD700' stroke-width='0.5'/>" +
+        "</svg>";
+
+    // Checkmark icon
+    private static final String ICON_CHECK =
+        "<svg width='24' height='24' viewBox='0 0 24 24' style='vertical-align:middle;margin-right:6px;'>" + SVG_GRADIENT_DEFS +
+        "<circle cx='12' cy='12' r='10' fill='url(#goldGrad)'/>" +
+        "<path d='M7 12 L10 15 L17 8' stroke='#FFD700' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/>" +
+        "</svg>";
     
     public interface ExportCompleteCallback {
         void onExportComplete(File exportFolder, int invoiceCount);
@@ -98,7 +176,7 @@ public class ExportHelper {
         String filename = "invoices_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + ".md";
         File file = saveToFile(exportDir, filename, md.toString());
         if (file != null) {
-            Toast.makeText(context, "✓ Exported " + invoices.size() + " invoices to:\nDownloads/MobileInvoiceOCR/" + filename, Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Exported " + invoices.size() + " invoices to:\nDownloads/MobileInvoiceOCR/" + filename, Toast.LENGTH_LONG).show();
             
             // Trigger callback for cleanup dialog
             if (callback != null) {
@@ -178,6 +256,451 @@ public class ExportHelper {
     }
 
     /**
+     * Export invoices to PDF format, zipped and ready to share
+     * PDFs open natively on any device - no browser required
+     */
+    public void exportToPDFZip(List<Invoice> invoices) {
+        if (invoices == null || invoices.isEmpty()) {
+            Toast.makeText(context, "No invoices to export", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            // Create folder structure: Delivery_Docket_MM-DD-YYYY
+            String dateFolder = new SimpleDateFormat("'Delivery_Docket_'MM-dd-yyyy", Locale.US).format(new Date());
+            File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            File mainExportDir = new File(downloadsDir, "MobileInvoiceOCR");
+            File deliveryDir = new File(mainExportDir, dateFolder);
+
+            if (!deliveryDir.exists()) {
+                deliveryDir.mkdirs();
+            }
+
+            int successCount = 0;
+
+            // Generate individual PDF files for each customer
+            for (Invoice invoice : invoices) {
+                try {
+                    String filename = sanitizeFilename(invoice.getCustomerName() + "_" + invoice.getInvoiceNumber()) + ".pdf";
+                    File pdfFile = new File(deliveryDir, filename);
+
+                    generatePDFDeliveryCard(invoice, pdfFile);
+                    successCount++;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (successCount > 0) {
+                // Create summary PDF
+                File summaryFile = new File(deliveryDir, "00_Delivery_Summary.pdf");
+                generateSummaryPDF(invoices, summaryFile);
+
+                // ZIP the entire folder
+                String zipFilename = dateFolder + ".zip";
+                File zipFile = new File(mainExportDir, zipFilename);
+                zipFolder(deliveryDir, zipFile);
+
+                // Show success and offer sharing options
+                showShareDialog(zipFile, successCount);
+
+                // Trigger callback for cleanup dialog
+                if (callback != null) {
+                    callback.onExportComplete(zipFile, successCount);
+                }
+            } else {
+                Toast.makeText(context, "Failed to export delivery cards", Toast.LENGTH_SHORT).show();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(context, "Error during export: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    /**
+     * Generate a PDF delivery card for a single invoice
+     */
+    private void generatePDFDeliveryCard(Invoice invoice, File outputFile) throws IOException {
+        // PDF page dimensions (Letter size: 8.5 x 11 inches at 72 dpi)
+        int pageWidth = 612;
+        int pageHeight = 792;
+
+        PdfDocument document = new PdfDocument();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm a", Locale.US);
+
+        // Create paints for different text styles
+        Paint titlePaint = new Paint();
+        titlePaint.setColor(Color.parseColor("#2c3e50"));
+        titlePaint.setTextSize(24);
+        titlePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+
+        Paint headerPaint = new Paint();
+        headerPaint.setColor(Color.parseColor("#34495e"));
+        headerPaint.setTextSize(16);
+        headerPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+
+        Paint labelPaint = new Paint();
+        labelPaint.setColor(Color.parseColor("#7f8c8d"));
+        labelPaint.setTextSize(12);
+        labelPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+
+        Paint valuePaint = new Paint();
+        valuePaint.setColor(Color.parseColor("#2c3e50"));
+        valuePaint.setTextSize(12);
+
+        Paint linePaint = new Paint();
+        linePaint.setColor(Color.parseColor("#3498db"));
+        linePaint.setStrokeWidth(3);
+
+        Paint footerPaint = new Paint();
+        footerPaint.setColor(Color.parseColor("#95a5a6"));
+        footerPaint.setTextSize(10);
+        footerPaint.setTextAlign(Paint.Align.CENTER);
+
+        // Track current Y position and page
+        int[] currentY = {50};
+        int[] pageNum = {1};
+        PdfDocument.Page[] currentPage = {document.startPage(new PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNum[0]).create())};
+        Canvas[] canvas = {currentPage[0].getCanvas()};
+
+        // Helper to check if we need a new page
+        Runnable checkNewPage = () -> {
+            if (currentY[0] > pageHeight - 80) {
+                // Finish current page
+                document.finishPage(currentPage[0]);
+                // Start new page
+                pageNum[0]++;
+                currentPage[0] = document.startPage(new PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNum[0]).create());
+                canvas[0] = currentPage[0].getCanvas();
+                currentY[0] = 50;
+            }
+        };
+
+        int margin = 40;
+        int contentWidth = pageWidth - (margin * 2);
+
+        // Draw title
+        canvas[0].drawText("Delivery Card", margin, currentY[0], titlePaint);
+        currentY[0] += 10;
+        canvas[0].drawLine(margin, currentY[0], pageWidth - margin, currentY[0], linePaint);
+        currentY[0] += 30;
+
+        // Draw invoice information
+        String[][] fields = {
+            {"Invoice #:", invoice.getInvoiceNumber()},
+            {"Customer:", invoice.getCustomerName()},
+            {"Address:", invoice.getAddress()},
+            {"Phone:", invoice.getPhone()},
+            {"Date/Time:", dateFormat.format(new Date(invoice.getTimestamp()))},
+            {"Items:", invoice.getItems()}
+        };
+
+        for (String[] field : fields) {
+            checkNewPage.run();
+            canvas[0].drawText(field[0], margin, currentY[0], labelPaint);
+            String value = field[1] != null ? field[1] : "";
+            // Word wrap long values
+            if (value.length() > 50) {
+                int labelWidth = 80;
+                drawWrappedText(canvas[0], value, margin + labelWidth, currentY[0], contentWidth - labelWidth, valuePaint);
+                currentY[0] += ((value.length() / 50) + 1) * 16;
+            } else {
+                canvas[0].drawText(value, margin + 80, currentY[0], valuePaint);
+                currentY[0] += 20;
+            }
+        }
+
+        // Notes if present
+        if (invoice.getNotes() != null && !invoice.getNotes().isEmpty()) {
+            checkNewPage.run();
+            canvas[0].drawText("Notes:", margin, currentY[0], labelPaint);
+            drawWrappedText(canvas[0], invoice.getNotes(), margin + 80, currentY[0], contentWidth - 80, valuePaint);
+            currentY[0] += 30;
+        }
+
+        currentY[0] += 20;
+
+        // Original Invoice Image
+        if (invoice.getOriginalImagePath() != null && !invoice.getOriginalImagePath().isEmpty()) {
+            checkNewPage.run();
+            canvas[0].drawText("Original Invoice", margin, currentY[0], headerPaint);
+            currentY[0] += 15;
+
+            Bitmap originalImg = loadAndScaleImage(invoice.getOriginalImagePath(), contentWidth, 250);
+            if (originalImg != null) {
+                // Check if image fits on current page
+                if (currentY[0] + originalImg.getHeight() > pageHeight - 80) {
+                    document.finishPage(currentPage[0]);
+                    pageNum[0]++;
+                    currentPage[0] = document.startPage(new PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNum[0]).create());
+                    canvas[0] = currentPage[0].getCanvas();
+                    currentY[0] = 50;
+                }
+                canvas[0].drawBitmap(originalImg, margin, currentY[0], null);
+                currentY[0] += originalImg.getHeight() + 20;
+                originalImg.recycle();
+            }
+        }
+
+        // POD Photos
+        String[] podPaths = {invoice.getPodImagePath1(), invoice.getPodImagePath2(), invoice.getPodImagePath3()};
+        boolean hasPOD = false;
+        for (int i = 0; i < podPaths.length; i++) {
+            if (podPaths[i] != null && !podPaths[i].isEmpty()) {
+                if (!hasPOD) {
+                    checkNewPage.run();
+                    canvas[0].drawText("Proof of Delivery Photos", margin, currentY[0], headerPaint);
+                    currentY[0] += 15;
+                    hasPOD = true;
+                }
+
+                Bitmap podImg = loadAndScaleImage(podPaths[i], contentWidth, 200);
+                if (podImg != null) {
+                    // Check if image fits
+                    if (currentY[0] + podImg.getHeight() > pageHeight - 80) {
+                        document.finishPage(currentPage[0]);
+                        pageNum[0]++;
+                        currentPage[0] = document.startPage(new PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNum[0]).create());
+                        canvas[0] = currentPage[0].getCanvas();
+                        currentY[0] = 50;
+                    }
+                    canvas[0].drawText("Photo " + (i + 1), margin, currentY[0], valuePaint);
+                    currentY[0] += 15;
+                    canvas[0].drawBitmap(podImg, margin, currentY[0], null);
+                    currentY[0] += podImg.getHeight() + 15;
+                    podImg.recycle();
+                }
+            }
+        }
+
+        // Signature
+        if (invoice.getSignatureImagePath() != null && !invoice.getSignatureImagePath().isEmpty()) {
+            checkNewPage.run();
+            canvas[0].drawText("Customer Signature", margin, currentY[0], headerPaint);
+            currentY[0] += 15;
+
+            Bitmap sigImg = loadAndScaleImage(invoice.getSignatureImagePath(), contentWidth / 2, 100);
+            if (sigImg != null) {
+                if (currentY[0] + sigImg.getHeight() > pageHeight - 80) {
+                    document.finishPage(currentPage[0]);
+                    pageNum[0]++;
+                    currentPage[0] = document.startPage(new PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNum[0]).create());
+                    canvas[0] = currentPage[0].getCanvas();
+                    currentY[0] = 50;
+                }
+                canvas[0].drawBitmap(sigImg, margin, currentY[0], null);
+                currentY[0] += sigImg.getHeight() + 20;
+                sigImg.recycle();
+            }
+        }
+
+        // Footer on last page
+        String footerText = "Generated by Mobile Invoice OCR • Export Date: " +
+            new SimpleDateFormat("MM/dd/yyyy hh:mm a", Locale.US).format(new Date());
+        canvas[0].drawText(footerText, pageWidth / 2, pageHeight - 30, footerPaint);
+
+        // Finish the document
+        document.finishPage(currentPage[0]);
+
+        // Write to file
+        FileOutputStream fos = new FileOutputStream(outputFile);
+        document.writeTo(fos);
+        document.close();
+        fos.close();
+    }
+
+    /**
+     * Generate a summary PDF with all deliveries listed
+     */
+    private void generateSummaryPDF(List<Invoice> invoices, File outputFile) throws IOException {
+        int pageWidth = 612;
+        int pageHeight = 792;
+
+        PdfDocument document = new PdfDocument();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
+
+        Paint titlePaint = new Paint();
+        titlePaint.setColor(Color.parseColor("#667eea"));
+        titlePaint.setTextSize(28);
+        titlePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+
+        Paint subtitlePaint = new Paint();
+        subtitlePaint.setColor(Color.parseColor("#666666"));
+        subtitlePaint.setTextSize(14);
+
+        Paint headerPaint = new Paint();
+        headerPaint.setColor(Color.parseColor("#2c3e50"));
+        headerPaint.setTextSize(14);
+        headerPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+
+        Paint textPaint = new Paint();
+        textPaint.setColor(Color.parseColor("#333333"));
+        textPaint.setTextSize(12);
+
+        Paint numberPaint = new Paint();
+        numberPaint.setColor(Color.parseColor("#3498db"));
+        numberPaint.setTextSize(16);
+        numberPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+
+        Paint linePaint = new Paint();
+        linePaint.setColor(Color.parseColor("#ecf0f1"));
+        linePaint.setStrokeWidth(1);
+
+        int margin = 40;
+        int currentY = 50;
+        int pageNum = 1;
+
+        PdfDocument.Page page = document.startPage(new PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNum).create());
+        Canvas canvas = page.getCanvas();
+
+        // Title
+        canvas.drawText("Delivery Docket", margin, currentY, titlePaint);
+        currentY += 25;
+        canvas.drawText("Date: " + dateFormat.format(new Date()), margin, currentY, subtitlePaint);
+        currentY += 40;
+
+        // Summary stats
+        int withPOD = 0, withSignature = 0;
+        for (Invoice inv : invoices) {
+            if ((inv.getPodImagePath1() != null && !inv.getPodImagePath1().isEmpty()) ||
+                (inv.getPodImagePath2() != null && !inv.getPodImagePath2().isEmpty()) ||
+                (inv.getPodImagePath3() != null && !inv.getPodImagePath3().isEmpty())) {
+                withPOD++;
+            }
+            if (inv.getSignatureImagePath() != null && !inv.getSignatureImagePath().isEmpty()) {
+                withSignature++;
+            }
+        }
+
+        canvas.drawText("Summary: " + invoices.size() + " deliveries | " + withPOD + " with POD | " + withSignature + " with signatures",
+            margin, currentY, subtitlePaint);
+        currentY += 30;
+
+        // Delivery list
+        canvas.drawText("Deliveries", margin, currentY, headerPaint);
+        currentY += 20;
+
+        for (int i = 0; i < invoices.size(); i++) {
+            // Check if need new page
+            if (currentY > pageHeight - 100) {
+                document.finishPage(page);
+                pageNum++;
+                page = document.startPage(new PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNum).create());
+                canvas = page.getCanvas();
+                currentY = 50;
+            }
+
+            Invoice inv = invoices.get(i);
+
+            // Draw item number
+            canvas.drawText("#" + (i + 1), margin, currentY, numberPaint);
+
+            // Invoice number and customer
+            String invoiceNum = inv.getInvoiceNumber() != null ? inv.getInvoiceNumber() : "N/A";
+            canvas.drawText(invoiceNum + " - " + (inv.getCustomerName() != null ? inv.getCustomerName() : "Unknown"),
+                margin + 40, currentY, headerPaint);
+            currentY += 16;
+
+            // Address
+            if (inv.getAddress() != null) {
+                canvas.drawText(inv.getAddress(), margin + 40, currentY, textPaint);
+                currentY += 14;
+            }
+
+            // Phone and items
+            String details = (inv.getPhone() != null ? inv.getPhone() : "No phone") + " • Items: " +
+                (inv.getItems() != null ? inv.getItems() : "N/A");
+            canvas.drawText(details, margin + 40, currentY, textPaint);
+            currentY += 20;
+
+            // Separator line
+            canvas.drawLine(margin, currentY, pageWidth - margin, currentY, linePaint);
+            currentY += 15;
+        }
+
+        document.finishPage(page);
+
+        FileOutputStream fos = new FileOutputStream(outputFile);
+        document.writeTo(fos);
+        document.close();
+        fos.close();
+    }
+
+    /**
+     * Load and scale an image to fit within max dimensions
+     */
+    private Bitmap loadAndScaleImage(String imagePath, int maxWidth, int maxHeight) {
+        try {
+            File imageFile = new File(imagePath);
+            if (!imageFile.exists()) return null;
+
+            // First decode bounds only
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(imagePath, options);
+
+            // Calculate sample size
+            int sampleSize = 1;
+            if (options.outWidth > maxWidth || options.outHeight > maxHeight) {
+                int widthRatio = Math.round((float) options.outWidth / maxWidth);
+                int heightRatio = Math.round((float) options.outHeight / maxHeight);
+                sampleSize = Math.max(widthRatio, heightRatio);
+            }
+
+            // Decode with sample size
+            options.inJustDecodeBounds = false;
+            options.inSampleSize = sampleSize;
+            Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+
+            if (bitmap == null) return null;
+
+            // Scale to fit
+            float scale = Math.min((float) maxWidth / bitmap.getWidth(), (float) maxHeight / bitmap.getHeight());
+            if (scale < 1) {
+                int newWidth = Math.round(bitmap.getWidth() * scale);
+                int newHeight = Math.round(bitmap.getHeight() * scale);
+                Bitmap scaled = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
+                bitmap.recycle();
+                return scaled;
+            }
+
+            return bitmap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Draw text with word wrapping
+     */
+    private void drawWrappedText(Canvas canvas, String text, float x, float y, int maxWidth, Paint paint) {
+        if (text == null || text.isEmpty()) return;
+
+        String[] words = text.split(" ");
+        StringBuilder line = new StringBuilder();
+        float lineY = y;
+
+        for (String word : words) {
+            String testLine = line.length() > 0 ? line + " " + word : word;
+            float testWidth = paint.measureText(testLine);
+
+            if (testWidth > maxWidth && line.length() > 0) {
+                canvas.drawText(line.toString(), x, lineY, paint);
+                line = new StringBuilder(word);
+                lineY += 16;
+            } else {
+                line = new StringBuilder(testLine);
+            }
+        }
+
+        if (line.length() > 0) {
+            canvas.drawText(line.toString(), x, lineY, paint);
+        }
+    }
+
+    /**
      * Generate HTML delivery card with embedded images
      */
     private String generateHTMLDeliveryCard(Invoice invoice) {
@@ -203,7 +726,7 @@ public class ExportHelper {
         html.append("</style>\n</head>\n<body>\n");
         
         html.append("<div class='card'>\n");
-        html.append("<h1>🚚 Delivery Card</h1>\n");
+        html.append("<h1>").append(ICON_TRUCK).append("Delivery Card</h1>\n");
         
         // Customer Information
         html.append("<div class='info-grid'>\n");
@@ -222,7 +745,7 @@ public class ExportHelper {
         if (invoice.getOriginalImagePath() != null && !invoice.getOriginalImagePath().isEmpty()) {
             String base64 = imageToBase64(invoice.getOriginalImagePath());
             if (base64 != null) {
-                html.append("<h2>📄 Original Invoice</h2>\n");
+                html.append("<h2>").append(ICON_DOCUMENT).append("Original Invoice</h2>\n");
                 html.append("<div class='image-section'>\n");
                 html.append("<img src='data:image/jpeg;base64,").append(base64).append("' alt='Original Invoice'>\n");
                 html.append("</div>\n");
@@ -235,7 +758,7 @@ public class ExportHelper {
         for (int i = 0; i < podPaths.length; i++) {
             if (podPaths[i] != null && !podPaths[i].isEmpty()) {
                 if (!hasPOD) {
-                    html.append("<h2>📷 Proof of Delivery Photos</h2>\n");
+                    html.append("<h2>").append(ICON_CAMERA).append("Proof of Delivery Photos</h2>\n");
                     html.append("<div class='image-section'>\n");
                     hasPOD = true;
                 }
@@ -254,7 +777,7 @@ public class ExportHelper {
         if (invoice.getSignatureImagePath() != null && !invoice.getSignatureImagePath().isEmpty()) {
             String base64 = imageToBase64(invoice.getSignatureImagePath());
             if (base64 != null) {
-                html.append("<h2>✍️ Customer Signature</h2>\n");
+                html.append("<h2>").append(ICON_SIGNATURE).append("Customer Signature</h2>\n");
                 html.append("<div class='image-section'>\n");
                 html.append("<img src='data:image/jpeg;base64,").append(base64).append("' alt='Signature'>\n");
                 html.append("</div>\n");
@@ -304,7 +827,7 @@ public class ExportHelper {
         html.append("</style>\n</head>\n<body>\n");
         
         html.append("<div class='header'>\n");
-        html.append("<h1>📦 Delivery Docket</h1>\n");
+        html.append("<h1>").append(ICON_PACKAGE).append("Delivery Docket</h1>\n");
         html.append("<p>Date: ").append(dateFormat.format(new Date())).append("</p>\n");
         html.append("</div>\n");
         
@@ -427,7 +950,7 @@ public class ExportHelper {
      */
     private void showShareDialog(File zipFile, int invoiceCount) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("✓ Export Complete");
+        builder.setTitle("Export Complete");
         builder.setMessage("Successfully exported " + invoiceCount + " delivery cards.\n\n" +
                           "File: " + zipFile.getName() + "\n" +
                           "Size: " + (zipFile.length() / 1024) + " KB\n\n" +
@@ -549,7 +1072,7 @@ public class ExportHelper {
             File summaryFile = createExportSummary(mainExportDir, invoices, successCount);
             
             // Show success message with location
-            Toast.makeText(context, "✓ Exported " + successCount + " delivery cards to:\nDownloads/MobileInvoiceOCR/" + mainExportDir.getName() + "\n\nOpen Files app to share", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Exported " + successCount + " delivery cards to:\nDownloads/MobileInvoiceOCR/" + mainExportDir.getName() + "\n\nOpen Files app to share", Toast.LENGTH_LONG).show();
             
             // Trigger callback for cleanup dialog
             if (callback != null) {
@@ -595,7 +1118,7 @@ public class ExportHelper {
         File file = saveToFile(exportDir, filename, tsv.toString());
         
         if (file != null) {
-            Toast.makeText(context, "✓ Exported " + invoices.size() + " invoices to:\nDownloads/MobileInvoiceOCR/" + filename + "\n\nOpen Files app to share", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Exported " + invoices.size() + " invoices to:\nDownloads/MobileInvoiceOCR/" + filename + "\n\nOpen Files app to share", Toast.LENGTH_LONG).show();
         }
     }
     
@@ -649,7 +1172,7 @@ public class ExportHelper {
             File file = saveToFile(exportDir, filename, root.toString(4)); // Pretty print with indent
             
             if (file != null) {
-                Toast.makeText(context, "✓ Exported " + invoices.size() + " invoices to:\nDownloads/MobileInvoiceOCR/" + filename + "\n\nOpen Files app to share", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "Exported " + invoices.size() + " invoices to:\nDownloads/MobileInvoiceOCR/" + filename + "\n\nOpen Files app to share", Toast.LENGTH_LONG).show();
             }
             
         } catch (JSONException e) {

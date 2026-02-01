@@ -26,6 +26,7 @@ public class SignatureView extends View {
     private Canvas canvas;
     private Bitmap bitmap;
     private Bitmap backgroundImage;
+    private boolean hasDrawn = false;
 
     public SignatureView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -82,6 +83,7 @@ public class SignatureView extends View {
             case MotionEvent.ACTION_UP:
                 canvas.drawPath(path, paint);
                 path.reset();
+                hasDrawn = true;
                 break;
                 
             default:
@@ -94,6 +96,7 @@ public class SignatureView extends View {
 
     public void clear() {
         path.reset();
+        hasDrawn = false;
         if (bitmap != null) {
             // Restore background - either invoice image or white
             if (backgroundImage != null) {
@@ -103,6 +106,10 @@ public class SignatureView extends View {
             }
         }
         invalidate();
+    }
+
+    public boolean hasSignature() {
+        return hasDrawn;
     }
 
     public void setBackgroundImage(String imagePath) {

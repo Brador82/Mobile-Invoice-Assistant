@@ -248,12 +248,16 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnOptimizeRoute"
-                        style="@style/ButtonStyle"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="56dp"
+                        android:background="@drawable/button_gradient_optimize"
                         android:text="🚚 Optimize Delivery Route"
-                        android:backgroundTint="#FF9800"
-                        app:icon="@android:drawable/ic_dialog_map" />
+                        android:textColor="@android:color/white"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="@null"
+                        app:icon="@android:drawable/ic_dialog_map"
+                        app:iconTint="@android:color/white" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
