@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -84,7 +85,7 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
             public void onCallClick(RouteOptimizer.RoutePoint stop) {
                 handleCallCustomer(stop);
             }
-            
+
             @Override
             public void onNavigateClick(RouteOptimizer.RoutePoint stop) {
                 handleNavigateToStop(stop);
@@ -97,12 +98,40 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
                 }
             }
         });
-        
+
+        // Setup stop change listener for priority and time adjustments
+        stopAdapter.setOnStopChangeListener(new RouteStopAdapter.OnStopChangeListener() {
+            @Override
+            public void onMakeFirst(RouteOptimizer.RoutePoint stop) {
+                handleMakeFirst(stop);
+            }
+
+            @Override
+            public void onMakeLast(RouteOptimizer.RoutePoint stop) {
+                handleMakeLast(stop);
+            }
+
+            @Override
+            public void onStopTimeChanged(RouteOptimizer.RoutePoint stop, int newTimeMinutes) {
+                handleStopTimeChanged(stop, newTimeMinutes);
+            }
+
+            @Override
+            public void onRouteOrderChanged() {
+                updateMapAfterReorder();
+            }
+
+            @Override
+            public void onCompletedChanged(RouteOptimizer.RoutePoint stop, boolean completed) {
+                handleCompletedChanged(stop, completed);
+            }
+        });
+
         binding.recyclerViewStops.setLayoutManager(new LinearLayoutManager(this));
         binding.recyclerViewStops.setAdapter(stopAdapter);
-        
+
         // Setup drag and drop
-        RouteItemTouchHelper.OnItemMovedListener moveListener = 
+        RouteItemTouchHelper.OnItemMovedListener moveListener =
             new RouteItemTouchHelper.OnItemMovedListener() {
                 @Override
                 public void onItemMoved(int fromPosition, int toPosition) {
@@ -110,10 +139,131 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
                     updateMapAfterReorder();
                 }
             };
-        
+
         RouteItemTouchHelper callback = new RouteItemTouchHelper(stopAdapter, moveListener);
         itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(binding.recyclerViewStops);
+    }
+
+    /**
+     * Handle "Make First" priority action
+     */
+    private void handleMakeFirst(RouteOptimizer.RoutePoint stop) {
+        List<RouteOptimizer.RoutePoint> activeStops = stopAdapter.getActiveStops();
+        RouteOptimizer.makeFirst(activeStops, stop);
+
+        // Clear other FIRST priorities
+        for (RouteOptimizer.RoutePoint s : activeStops) {
+            if (s != stop && s.priority == RouteOptimizer.PRIORITY_FIRST) {
+                s.priority = RouteOptimizer.PRIORITY_NORMAL;
+            }
+        }
+
+        // Update route and recalculate ETAs
+        optimizedRoute.orderedPoints = activeStops;
+        recalculateETAsAndRefresh();
+
+        Toast.makeText(this, stop.invoice.getCustomerName() + " moved to first", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Handle "Make Last" priority action
+     */
+    private void handleMakeLast(RouteOptimizer.RoutePoint stop) {
+        List<RouteOptimizer.RoutePoint> activeStops = stopAdapter.getActiveStops();
+        RouteOptimizer.makeLast(activeStops, stop);
+
+        // Clear other LAST priorities
+        for (RouteOptimizer.RoutePoint s : activeStops) {
+            if (s != stop && s.priority == RouteOptimizer.PRIORITY_LAST) {
+                s.priority = RouteOptimizer.PRIORITY_NORMAL;
+            }
+        }
+
+        // Update route and recalculate ETAs
+        optimizedRoute.orderedPoints = activeStops;
+        recalculateETAsAndRefresh();
+
+        Toast.makeText(this, stop.invoice.getCustomerName() + " moved to last", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Handle stop time change
+     */
+    private void handleStopTimeChanged(RouteOptimizer.RoutePoint stop, int newTimeMinutes) {
+        stop.stopTimeMinutes = newTimeMinutes;
+
+        // Recalculate ETAs for all subsequent stops
+        recalculateETAsAndRefresh();
+    }
+
+    /**
+     * Handle delivery completed checkbox change
+     */
+    private void handleCompletedChanged(RouteOptimizer.RoutePoint stop, boolean completed) {
+        // Update the invoice's completed status
+        stop.invoice.setCompleted(completed);
+
+        // Save to database
+        new Thread(() -> {
+            database.invoiceDao().update(stop.invoice);
+            runOnUiThread(() -> {
+                // Refresh the adapter to update styling
+                stopAdapter.setStops(stopAdapter.getAllStops());
+                recalculateETAsAndRefresh();
+
+                String status = completed ? "completed" : "active";
+                Toast.makeText(this, stop.invoice.getCustomerName() + " marked as " + status,
+                    Toast.LENGTH_SHORT).show();
+            });
+        }).start();
+    }
+
+    /**
+     * Recalculate ETAs and refresh the display
+     */
+    private void recalculateETAsAndRefresh() {
+        if (optimizedRoute == null || optimizedRoute.orderedPoints.isEmpty()) {
+            return;
+        }
+
+        double startLat = currentLocation != null ?
+            currentLocation.getLatitude() : optimizedRoute.orderedPoints.get(0).latitude;
+        double startLng = currentLocation != null ?
+            currentLocation.getLongitude() : optimizedRoute.orderedPoints.get(0).longitude;
+
+        // Recalculate ETAs
+        RouteOptimizer.recalculateETAs(optimizedRoute, startLat, startLng);
+
+        // Recalculate distance
+        recalculateRouteDistance();
+
+        // Rebuild adapter items to show updated ETAs
+        List<RouteOptimizer.RoutePoint> allPoints = new ArrayList<>(optimizedRoute.orderedPoints);
+
+        // Re-add completed stops
+        List<Invoice> allInvoices;
+        try {
+            allInvoices = database.invoiceDao().getAllInvoicesSync();
+            for (Invoice invoice : allInvoices) {
+                if (invoice.isCompleted()) {
+                    RouteOptimizer.RoutePoint completedPoint =
+                        new RouteOptimizer.RoutePoint(invoice, 0, 0, invoice.getAddress());
+                    completedPoint.orderIndex = 0;
+                    allPoints.add(completedPoint);
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error loading completed invoices", e);
+        }
+
+        stopAdapter.setStops(allPoints);
+
+        // Update map
+        displayRouteOnMap(startLat, startLng);
+
+        // Update summary
+        updateRouteSummary();
     }
     
     /**
@@ -123,9 +273,9 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
         if (googleMap == null || optimizedRoute == null) {
             return;
         }
-        
-        // Update the optimized route with new order
-        optimizedRoute.orderedPoints = stopAdapter.getStops();
+
+        // Update the optimized route with new order (ACTIVE ONLY)
+        optimizedRoute.orderedPoints = stopAdapter.getActiveStops();
         
         // Recalculate total distance
         recalculateRouteDistance();
@@ -174,13 +324,25 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
         if (optimizedRoute == null || optimizedRoute.orderedPoints.isEmpty()) {
             return;
         }
-        
-        String summary = String.format(
-            "Optimized Route\n%d stops • %.1f km • %s estimated",
-            optimizedRoute.totalStops,
-            optimizedRoute.totalDistance,
-            RouteOptimizer.estimateTravelTime(optimizedRoute.totalDistance)
-        );
+
+        String endTime = optimizedRoute.getFormattedEndTime();
+        String summary;
+
+        if (endTime != null && !endTime.equals("N/A")) {
+            summary = String.format(
+                "Optimized Route\n%d stops • %.1f km • Finish by %s",
+                optimizedRoute.orderedPoints.size(),
+                optimizedRoute.totalDistance,
+                endTime
+            );
+        } else {
+            summary = String.format(
+                "Optimized Route\n%d stops • %.1f km • %s estimated",
+                optimizedRoute.orderedPoints.size(),
+                optimizedRoute.totalDistance,
+                RouteOptimizer.estimateTravelTime(optimizedRoute.totalDistance)
+            );
+        }
         binding.tvRouteSummary.setText(summary);
     }
     
@@ -370,9 +532,9 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
         new Thread(() -> {
             try {
                 // Get all invoices from database
-                List<Invoice> invoices = database.invoiceDao().getAllInvoicesSync();
-                
-                if (invoices.isEmpty()) {
+                List<Invoice> allInvoices = database.invoiceDao().getAllInvoicesSync();
+
+                if (allInvoices.isEmpty()) {
                     runOnUiThread(() -> {
                         binding.progressBar.setVisibility(View.GONE);
                         binding.tvRouteSummary.setText("No deliveries to route");
@@ -380,10 +542,33 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
                     });
                     return;
                 }
-                
-                // Optimize route
+
+                // FILTER: Only optimize active invoices (exclude completed)
+                List<Invoice> activeInvoices = new ArrayList<>();
+                for (Invoice invoice : allInvoices) {
+                    if (invoice.isActive()) {
+                        activeInvoices.add(invoice);
+                    }
+                }
+
+                if (activeInvoices.isEmpty()) {
+                    runOnUiThread(() -> {
+                        binding.progressBar.setVisibility(View.GONE);
+                        binding.tvRouteSummary.setText("All deliveries completed");
+
+                        // Still show completed items in list
+                        Toast.makeText(this, "No active deliveries to route", Toast.LENGTH_SHORT).show();
+                    });
+                    return;
+                }
+
+                // Optimize route with ACTIVE invoices only
                 RouteOptimizer optimizer = new RouteOptimizer(this);
-                optimizedRoute = optimizer.optimizeRoute(invoices, startLat, startLng);
+                optimizedRoute = optimizer.optimizeRoute(activeInvoices, startLat, startLng);
+
+                // Calculate ETAs for all stops (starting now)
+                long startTimeMillis = System.currentTimeMillis();
+                RouteOptimizer.calculateETAs(optimizedRoute, startLat, startLng, startTimeMillis);
                 
                 // Update UI on main thread
                 runOnUiThread(() -> {
@@ -410,11 +595,30 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
                     // Enable action buttons
                     binding.btnStartNavigation.setEnabled(true);
                     binding.btnReorderList.setEnabled(true);
-                    
-                    // Update RecyclerView with stops
-                    stopAdapter.setStops(optimizedRoute.orderedPoints);
-                    
-                    Toast.makeText(this, "Route optimized successfully!", Toast.LENGTH_SHORT).show();
+
+                    // Update RecyclerView with ALL stops (active + completed)
+                    // Adapter will handle splitting into sections
+                    List<RouteOptimizer.RoutePoint> allPoints = new ArrayList<>(optimizedRoute.orderedPoints);
+
+                    // Add completed invoices to list (they won't be in optimized route)
+                    for (Invoice invoice : allInvoices) {
+                        if (invoice.isCompleted()) {
+                            // Create RoutePoint for completed items (with address, no geocoding)
+                            RouteOptimizer.RoutePoint completedPoint =
+                                new RouteOptimizer.RoutePoint(invoice, 0, 0, invoice.getAddress());
+                            completedPoint.orderIndex = 0; // No order for completed
+                            allPoints.add(completedPoint);
+                        }
+                    }
+
+                    stopAdapter.setStops(allPoints);
+
+                    // Show dialog if some invoices failed to geocode
+                    if (!optimizedRoute.failedInvoices.isEmpty()) {
+                        showGeocodingFailuresDialog(optimizedRoute.failedInvoices);
+                    } else {
+                        Toast.makeText(this, "Route optimized successfully!", Toast.LENGTH_SHORT).show();
+                    }
                 });
                 
             } catch (Exception e) {
@@ -537,22 +741,22 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
         if (optimizedRoute == null || optimizedRoute.orderedPoints.isEmpty()) {
             return;
         }
-        
+
         new Thread(() -> {
             try {
                 // Update invoice order in database
                 // This could be done by adding a "routeOrder" field to Invoice entity
                 // For now, we'll just show a toast
-                
+
                 runOnUiThread(() -> {
-                    Toast.makeText(this, 
-                        "Route order saved! " + optimizedRoute.totalStops + " stops reordered", 
+                    Toast.makeText(this,
+                        "Route order saved! " + optimizedRoute.totalStops + " stops reordered",
                         Toast.LENGTH_LONG).show();
-                    
+
                     // Return to main activity
                     finish();
                 });
-                
+
             } catch (Exception e) {
                 Log.e(TAG, "Error reordering invoices", e);
                 runOnUiThread(() -> {
@@ -560,5 +764,32 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
                 });
             }
         }).start();
+    }
+
+    /**
+     * Show a dialog listing invoices that failed geocoding
+     */
+    private void showGeocodingFailuresDialog(List<RouteOptimizer.GeocodingFailure> failures) {
+        StringBuilder message = new StringBuilder();
+        message.append("The following invoices could not be added to the route:\n\n");
+
+        for (RouteOptimizer.GeocodingFailure failure : failures) {
+            String customerName = failure.invoice.getCustomerName();
+            String invoiceNum = failure.invoice.getInvoiceNumber();
+            message.append("• ").append(customerName != null ? customerName : "Unknown");
+            if (invoiceNum != null && !invoiceNum.isEmpty()) {
+                message.append(" (#").append(invoiceNum).append(")");
+            }
+            message.append("\n   ").append(failure.reason).append("\n\n");
+        }
+
+        message.append("Please check the addresses for these invoices.");
+
+        new AlertDialog.Builder(this)
+            .setTitle("Missing Stops (" + failures.size() + ")")
+            .setMessage(message.toString())
+            .setPositiveButton("OK", null)
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .show();
     }
 }

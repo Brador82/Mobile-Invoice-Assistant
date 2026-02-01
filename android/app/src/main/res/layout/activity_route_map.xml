@@ -71,20 +71,60 @@
         android:id="@+id/summaryBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#2196F3"
+        android:background="@drawable/gradient_summary_bar"
         android:elevation="4dp"
-        android:orientation="vertical"
-        android:padding="12dp">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp">
 
-        <TextView
-            android:id="@+id/tvRouteSummary"
-            android:layout_width="match_parent"
+        <!-- Google Maps Icon (Left) -->
+        <ImageView
+            android:id="@+id/ivMapsIcon"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_google_maps"
+            android:contentDescription="Route map" />
+
+        <!-- Route Summary Text (Center) -->
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Calculating optimal route..."
-            android:textAlignment="center"
-            android:textColor="@android:color/white"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp">
+
+            <TextView
+                android:id="@+id/tvRouteTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Optimized Route"
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvRouteSummary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Calculating optimal route..."
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+
+        <!-- Target/Bullseye Icon (Right) -->
+        <ImageView
+            android:id="@+id/ivTargetIcon"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_target_bullseye"
+            android:contentDescription="Route target" />
 
     </LinearLayout>
 

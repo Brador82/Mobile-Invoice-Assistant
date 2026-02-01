@@ -23,9 +23,11 @@ public class Invoice {
     private String originalImagePath;
     private String rawOcrText;
     private long timestamp;
+    private String status; // Values: "PENDING", "IN_TRANSIT", "DELIVERED", "CANCELLED"
 
     public Invoice() {
         this.timestamp = System.currentTimeMillis();
+        this.status = "PENDING"; // Default to PENDING
     }
 
     // Getters
@@ -43,6 +45,7 @@ public class Invoice {
     public String getOriginalImagePath() { return originalImagePath; }
     public String getRawOcrText() { return rawOcrText; }
     public long getTimestamp() { return timestamp; }
+    public String getStatus() { return status; }
 
     // Setters
     public void setId(int id) { this.id = id; }
@@ -59,4 +62,19 @@ public class Invoice {
     public void setOriginalImagePath(String originalImagePath) { this.originalImagePath = originalImagePath; }
     public void setRawOcrText(String rawOcrText) { this.rawOcrText = rawOcrText; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
+    public void setStatus(String status) { this.status = status; }
+
+    // Utility methods for status checking
+    public boolean isCompleted() {
+        return "DELIVERED".equals(status) || "CANCELLED".equals(status);
+    }
+
+    public boolean isActive() {
+        return "PENDING".equals(status) || "IN_TRANSIT".equals(status);
+    }
+
+    // Set completed status
+    public void setCompleted(boolean completed) {
+        this.status = completed ? "DELIVERED" : "PENDING";
+    }
 }

@@ -5,108 +5,393 @@
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     app:cardCornerRadius="8dp"
-    app:cardElevation="2dp">
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="#1A1A1A">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp">
+        android:orientation="vertical"
+        android:background="@drawable/gradient_card_route">
 
-        <!-- Stop Number Badge -->
-        <TextView
-            android:id="@+id/tvStopNumber"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/circle_background"
-            android:gravity="center"
-            android:text="1"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <!-- Stop Details -->
+        <!-- Main Content Row (Always Visible) -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:id="@+id/mainContent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
 
-            <!-- Customer Name -->
+            <!-- Stop Number Badge (Gold) -->
             <TextView
-                android:id="@+id/tvCustomerName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Customer Name"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
+                android:id="@+id/tvStopNumber"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/circle_background_gold"
+                android:gravity="center"
+                android:text="1"
+                android:textColor="#1A1A1A"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <!-- Address -->
-            <TextView
-                android:id="@+id/tvAddress"
-                android:layout_width="match_parent"
+            <!-- Stop Details -->
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:text="Address"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="14sp" />
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-            <!-- Items/Distance Info -->
-            <TextView
-                android:id="@+id/tvStopInfo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Items: X • Distance: X km"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="12sp" />
+                <!-- Customer Name (Gold) -->
+                <TextView
+                    android:id="@+id/tvCustomerName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Customer Name"
+                    android:textColor="#D4AF37"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <!-- Address (White) -->
+                <TextView
+                    android:id="@+id/tvAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:text="123 Main Street, City, ST 12345"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp" />
+
+                <!-- Items (Light Gray) -->
+                <TextView
+                    android:id="@+id/tvStopInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Items: Washer, Dryer"
+                    android:textColor="#CCCCCC"
+                    android:textSize="12sp" />
+
+                <!-- ETA Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <!-- ETA Badge -->
+                    <TextView
+                        android:id="@+id/tvETA"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/badge_eta"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
+                        android:text="ETA: 10:30 AM"
+                        android:textColor="#FFD700"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <!-- Stop Time -->
+                    <TextView
+                        android:id="@+id/tvStopTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="(15 min stop)"
+                        android:textColor="#999999"
+                        android:textSize="11sp" />
+
+                    <!-- Priority Badge (if set) -->
+                    <TextView
+                        android:id="@+id/tvPriorityBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/badge_priority"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="6dp"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
+                        android:text="FIRST"
+                        android:textColor="#1A1A1A"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Action Buttons Column -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+                <!-- Call Button -->
+                <ImageButton
+                    android:id="@+id/btnCall"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Call customer"
+                    android:src="@android:drawable/ic_menu_call"
+                    app:tint="#4CAF50" />
+
+                <!-- Navigate Button -->
+                <ImageButton
+                    android:id="@+id/btnNavigate"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginTop="4dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Navigate to this stop"
+                    android:src="@android:drawable/ic_menu_directions"
+                    app:tint="#2196F3" />
+
+            </LinearLayout>
+
+            <!-- Expand/Drag/Complete Column -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+                android:layout_marginStart="4dp">
+
+                <!-- Expand Button -->
+                <ImageButton
+                    android:id="@+id/btnExpand"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Expand options"
+                    android:src="@android:drawable/arrow_down_float"
+                    app:tint="#D4AF37" />
+
+                <!-- Drag Handle -->
+                <ImageView
+                    android:id="@+id/dragHandle"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginTop="4dp"
+                    android:contentDescription="Drag to reorder"
+                    android:padding="4dp"
+                    android:src="@android:drawable/ic_menu_sort_by_size"
+                    app:tint="#888888" />
+
+                <!-- Completed Checkbox -->
+                <CheckBox
+                    android:id="@+id/cbCompleted"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginTop="4dp"
+                    android:button="@null"
+                    android:background="@drawable/checkbox_completed"
+                    android:contentDescription="Mark delivery completed" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
-        <!-- Action Buttons -->
+        <!-- Expandable Options Panel -->
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:orientation="vertical">
+            android:id="@+id/expandablePanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:background="#0D0D0D"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp">
 
-            <!-- Call Button -->
-            <ImageButton
-                android:id="@+id/btnCall"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Call customer"
-                android:src="@android:drawable/ic_menu_call"
-                android:tint="#4CAF50" />
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#333333"
+                android:layout_marginBottom="12dp" />
 
-            <!-- Navigate Button -->
-            <ImageButton
-                android:id="@+id/btnNavigate"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginTop="4dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Navigate to this stop"
-                android:src="@android:drawable/ic_menu_directions"
-                android:tint="#2196F3" />
+            <!-- Priority Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delivery Priority"
+                android:textColor="#999999"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <!-- Make First Button -->
+                <Button
+                    android:id="@+id/btnMakeFirst"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/button_priority_first"
+                    android:text="↑ Make First"
+                    android:textColor="#000000"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="false"
+                    android:elevation="2dp" />
+
+                <!-- Make Last Button -->
+                <Button
+                    android:id="@+id/btnMakeLast"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_priority_last"
+                    android:text="↓ Make Last"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="false" />
+
+            </LinearLayout>
+
+            <!-- Stop Time Adjustment Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Estimated Stop Time"
+                android:textColor="#999999"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <!-- Decrease Time Button -->
+                <ImageButton
+                    android:id="@+id/btnDecreaseTime"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/button_time_adjust"
+                    android:contentDescription="Decrease stop time"
+                    android:src="@drawable/ic_time_subtract"
+                    android:scaleType="centerInside"
+                    android:padding="8dp" />
+
+                <!-- Current Stop Time Display -->
+                <TextView
+                    android:id="@+id/tvStopTimeValue"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="15 minutes"
+                    android:textColor="#D4AF37"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <!-- Increase Time Button -->
+                <ImageButton
+                    android:id="@+id/btnIncreaseTime"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/button_time_adjust"
+                    android:contentDescription="Increase stop time"
+                    android:src="@drawable/ic_time_add"
+                    android:scaleType="centerInside"
+                    android:padding="8dp" />
+
+            </LinearLayout>
+
+            <!-- Quick Time Presets -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnTime5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:minWidth="48dp"
+                    android:background="@drawable/button_time_preset"
+                    android:text="5m"
+                    android:textColor="#CCCCCC"
+                    android:textSize="11sp"
+                    android:textAllCaps="false" />
+
+                <Button
+                    android:id="@+id/btnTime10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:minWidth="48dp"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/button_time_preset"
+                    android:text="10m"
+                    android:textColor="#CCCCCC"
+                    android:textSize="11sp"
+                    android:textAllCaps="false" />
+
+                <Button
+                    android:id="@+id/btnTime15"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:minWidth="48dp"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/button_time_preset_selected"
+                    android:text="15m"
+                    android:textColor="#D4AF37"
+                    android:textSize="11sp"
+                    android:textAllCaps="false" />
+
+                <Button
+                    android:id="@+id/btnTime30"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:minWidth="48dp"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/button_time_preset"
+                    android:text="30m"
+                    android:textColor="#CCCCCC"
+                    android:textSize="11sp"
+                    android:textAllCaps="false" />
+
+                <Button
+                    android:id="@+id/btnTime45"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:minWidth="48dp"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/button_time_preset"
+                    android:text="45m"
+                    android:textColor="#CCCCCC"
+                    android:textSize="11sp"
+                    android:textAllCaps="false" />
+
+            </LinearLayout>
 
         </LinearLayout>
-
-        <!-- Drag Handle -->
-        <ImageView
-            android:id="@+id/dragHandle"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="8dp"
-            android:contentDescription="Drag to reorder"
-            android:padding="8dp"
-            android:src="@android:drawable/ic_menu_sort_by_size"
-            android:tint="@android:color/darker_gray" />
 
     </LinearLayout>
 
