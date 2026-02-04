@@ -166,9 +166,10 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <!-- Main Content -->
-             <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <!-- Delivery List -->
             <androidx.recyclerview.widget.RecyclerView
@@ -213,11 +214,10 @@
                     android:text="Tap the + button below to create\nyour first delivery"
                     android:textColor="@android:color/darker_gray"
                     android:textSize="16sp" />
-                 </LinearLayout>
-             </FrameLayout>
-                                                   
-        <!-- Floating Action Button -->
-   
+            </LinearLayout>
+        </FrameLayout>
+
+    <!-- Floating Action Button -->
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fab_add_delivery"
         android:layout_width="wrap_content"
