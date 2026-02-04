@@ -213,11 +213,11 @@
                     android:text="Tap the + button below to create\nyour first delivery"
                     android:textColor="@android:color/darker_gray"
                     android:textSize="16sp" />
-            </LinearLayout>
-        </FrameLayout>
-    </androidx.core.widget.NestedScrollView>
-
-    <!-- Floating Action Button -->
+                 </LinearLayout>
+             </FrameLayout>
+                                                   
+        <!-- Floating Action Button -->
+   
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fab_add_delivery"
         android:layout_width="wrap_content"
