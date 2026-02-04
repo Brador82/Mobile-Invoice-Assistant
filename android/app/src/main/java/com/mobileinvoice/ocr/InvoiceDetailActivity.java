@@ -86,14 +86,17 @@ public class InvoiceDetailActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    signaturePath = result.getData().getStringExtra("signature_path");
+                    // Use form_path (full delivery form with terms) for export
+                    // Falls back to signature_path if form_path not available
+                    String formPath = result.getData().getStringExtra("form_path");
+                    signaturePath = formPath != null ? formPath : result.getData().getStringExtra("signature_path");
                     Uri signatureUri = result.getData().getData();
-                    
+
                     if (signatureUri != null) {
                         binding.ivSignature.setImageURI(signatureUri);
                         binding.ivSignature.setVisibility(View.VISIBLE);
                         binding.btnCaptureSignature.setText("Change Signature");
-                        Toast.makeText(this, "Signature captured!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Delivery form saved!", Toast.LENGTH_SHORT).show();
                     } else if (signaturePath != null) {
                         File sigFile = new File(signaturePath);
                         if (sigFile.exists()) {
@@ -228,12 +231,19 @@ public class InvoiceDetailActivity extends AppCompatActivity {
     private void setupClickListeners() {
         binding.btnCaptureSignature.setOnClickListener(v -> {
             Intent intent = new Intent(this, SignatureActivity.class);
+
+            // Pass customer name and invoice ID for the delivery form
+            if (currentInvoice != null) {
+                intent.putExtra("customer_name", currentInvoice.getCustomerName());
+                intent.putExtra("invoice_id", currentInvoice.getId());
+            }
+
             // Pass the original invoice image path to show as background
             if (currentInvoice != null && currentInvoice.getOriginalImagePath() != null) {
                 String imagePath = currentInvoice.getOriginalImagePath();
                 android.util.Log.d("InvoiceDetail", "Passing image path to signature: " + imagePath);
                 intent.putExtra("invoice_image_path", imagePath);
-                
+
                 // Grant URI permission if it's a content:// URI
                 if (imagePath.startsWith("content://")) {
                     intent.setData(android.net.Uri.parse(imagePath));
@@ -306,7 +316,14 @@ public class InvoiceDetailActivity extends AppCompatActivity {
         podCameraLauncher.launch(intent);
     }
     
+    private AlertDialog currentItemDialog = null;
+
     private void showItemSelectionDialog() {
+        // Dismiss any existing dialog first
+        if (currentItemDialog != null && currentItemDialog.isShowing()) {
+            currentItemDialog.dismiss();
+        }
+
         // Create a custom dialog with better item management
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Delivered Items");
@@ -316,23 +333,32 @@ public class InvoiceDetailActivity extends AppCompatActivity {
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setPadding(32, 16, 32, 16);
+        layout.setBackgroundColor(0xFF2D2D2D); // Dark background
 
         // Add current items section
         if (!selectedItems.isEmpty()) {
             TextView currentHeader = new TextView(this);
             currentHeader.setText("Currently Selected Items:");
             currentHeader.setTextSize(16);
-            currentHeader.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+            currentHeader.setTextColor(0xFFD4AF37); // Gold color
             currentHeader.setPadding(0, 0, 0, 16);
             layout.addView(currentHeader);
 
             for (String item : selectedItems) {
                 TextView itemView = new TextView(this);
-                itemView.setText("• " + item);
+                itemView.setText("• " + item + " (tap to remove)");
                 itemView.setTextSize(14);
-                itemView.setPadding(16, 8, 16, 8);
-                itemView.setBackgroundResource(android.R.drawable.editbox_background);
+                itemView.setTextColor(0xFFFFFFFF); // White text
+                itemView.setPadding(16, 12, 16, 12);
+                itemView.setBackgroundColor(0xFF3D3D3D); // Darker gray
                 itemView.setClickable(true);
+
+                // Add margin between items
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                params.setMargins(0, 4, 0, 4);
+                itemView.setLayoutParams(params);
+
                 itemView.setOnClickListener(v -> {
                     selectedItems.remove(item);
                     updateSelectedItemsDisplay();
@@ -345,9 +371,9 @@ public class InvoiceDetailActivity extends AppCompatActivity {
 
             // Add divider
             View divider = new View(this);
-            divider.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+            divider.setBackgroundColor(0xFF555555);
             LinearLayout.LayoutParams dividerParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, 1);
+                LinearLayout.LayoutParams.MATCH_PARENT, 2);
             dividerParams.setMargins(0, 16, 0, 16);
             divider.setLayoutParams(dividerParams);
             layout.addView(divider);
@@ -357,7 +383,7 @@ public class InvoiceDetailActivity extends AppCompatActivity {
         TextView availableHeader = new TextView(this);
         availableHeader.setText("Available Items:");
         availableHeader.setTextSize(16);
-        availableHeader.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+        availableHeader.setTextColor(0xFFD4AF37); // Gold color
         availableHeader.setPadding(0, 0, 0, 16);
         layout.addView(availableHeader);
 
@@ -366,9 +392,17 @@ public class InvoiceDetailActivity extends AppCompatActivity {
                 TextView itemView = new TextView(this);
                 itemView.setText("+ " + availableItem);
                 itemView.setTextSize(14);
-                itemView.setPadding(16, 8, 16, 8);
-                itemView.setBackgroundResource(android.R.drawable.btn_default);
+                itemView.setTextColor(0xFFCCCCCC); // Light gray text
+                itemView.setPadding(16, 12, 16, 12);
+                itemView.setBackgroundColor(0xFF1A1A1A); // Very dark background
                 itemView.setClickable(true);
+
+                // Add margin between items
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                params.setMargins(0, 4, 0, 4);
+                itemView.setLayoutParams(params);
+
                 itemView.setOnClickListener(v -> {
                     selectedItems.add(availableItem);
                     updateSelectedItemsDisplay();
@@ -383,11 +417,14 @@ public class InvoiceDetailActivity extends AppCompatActivity {
         scrollView.addView(layout);
         builder.setView(scrollView);
 
-        builder.setPositiveButton("Done", (dialog, which) -> updateSelectedItemsDisplay());
-        builder.setNegativeButton("Cancel", null);
+        builder.setPositiveButton("Done", (dialog, which) -> {
+            updateSelectedItemsDisplay();
+            dialog.dismiss();
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
 
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        currentItemDialog = builder.create();
+        currentItemDialog.show();
     }
     
     private void updateSelectedItemsDisplay() {

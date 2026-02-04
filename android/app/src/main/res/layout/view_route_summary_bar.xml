@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Route summary bar showing stops, distance, and ETA -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/routeSummaryBar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/gold"
+    android:padding="12dp"
+    android:visibility="gone">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <!-- Route icon -->
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_dialog_map"
+            android:tint="@color/dark_background" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp">
+
+            <TextView
+                android:id="@+id/tvRouteTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Optimized Route"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/dark_background" />
+
+            <TextView
+                android:id="@+id/tvRouteStats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 stops - 0.0 km - ETA: --:--"
+                android:textSize="13sp"
+                android:textColor="@color/dark_background" />
+
+        </LinearLayout>
+
+        <!-- Optimize button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOptimizeInMap"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="Optimize"
+            android:textSize="12sp"
+            android:textColor="@color/gold"
+            android:backgroundTint="@color/dark_background"
+            android:minWidth="0dp"
+            android:paddingHorizontal="12dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

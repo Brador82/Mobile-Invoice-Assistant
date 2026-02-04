@@ -51,10 +51,11 @@
             android:name=".CameraActivity"
             android:screenOrientation="portrait" />
 
-        <!-- Signature Activity -->
+        <!-- Signature Activity (fullscreen, auto-rotate) -->
         <activity
             android:name=".SignatureActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="sensor"
+            android:theme="@style/Theme.MobileInvoiceOCR.Fullscreen" />
 
         <!-- Route Map Activity for delivery route optimization -->
         <activity

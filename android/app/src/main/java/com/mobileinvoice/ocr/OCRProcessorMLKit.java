@@ -496,9 +496,14 @@ public class OCRProcessorMLKit {
         }
         
         // Second pass: If no "Type:" fields found, search for known appliance keywords
+        // Note: Skip "Other" in keyword search since it's too common a word
         if (foundItems.isEmpty()) {
             for (String line : lines) {
                 for (String appliance : APPLIANCE_TYPES) {
+                    // Skip "Other" - it's a catch-all, not something to auto-detect
+                    if (appliance.equals("Other")) {
+                        continue;
+                    }
                     if (line.toLowerCase().contains(appliance.toLowerCase())) {
                         if (!foundItems.contains(appliance)) {
                             foundItems.add(appliance);

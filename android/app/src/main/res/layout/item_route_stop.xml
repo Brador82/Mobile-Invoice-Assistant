@@ -106,7 +106,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:text="(15 min stop)"
+                        android:text="(30 min stop)"
                         android:textColor="#999999"
                         android:textSize="11sp" />
 
@@ -248,7 +248,7 @@
                     android:layout_marginEnd="8dp"
                     android:background="@drawable/button_priority_first"
                     android:text="↑ Make First"
-                    android:textColor="#000000"
+                    android:textColor="#FFFFFF"
                     android:textSize="13sp"
                     android:textStyle="bold"
                     android:textAllCaps="false"
@@ -304,7 +304,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="15 minutes"
+                    android:text="30 minutes"
                     android:textColor="#D4AF37"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -359,9 +359,9 @@
                     android:layout_height="32dp"
                     android:minWidth="48dp"
                     android:layout_marginStart="6dp"
-                    android:background="@drawable/button_time_preset_selected"
+                    android:background="@drawable/button_time_preset"
                     android:text="15m"
-                    android:textColor="#D4AF37"
+                    android:textColor="#CCCCCC"
                     android:textSize="11sp"
                     android:textAllCaps="false" />
 
@@ -371,9 +371,9 @@
                     android:layout_height="32dp"
                     android:minWidth="48dp"
                     android:layout_marginStart="6dp"
-                    android:background="@drawable/button_time_preset"
+                    android:background="@drawable/button_time_preset_selected"
                     android:text="30m"
-                    android:textColor="#CCCCCC"
+                    android:textColor="#D4AF37"
                     android:textSize="11sp"
                     android:textAllCaps="false" />
 

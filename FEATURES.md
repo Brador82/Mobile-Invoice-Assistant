@@ -1,6 +1,6 @@
 # ✅ Mobile Invoice OCR - Feature Implementation Checklist
 
-**Last Updated:** January 30, 2026
+**Last Updated:** February 3, 2026
 
 ## Core Features Implemented
 
@@ -82,7 +82,7 @@
 - [x] FileProvider integration for viewing
 - [x] Auto-save on navigation
 
-### ✍️ Digital Signature (Android)
+### ✍️ Digital Signature (Android) - ENHANCED Feb 3, 2026
 
 - [x] SignatureView canvas-based capture
 - [x] Touch/stylus support
@@ -93,6 +93,15 @@
 - [x] Thumbnail display in detail screen
 - [x] "Change Signature" button when captured
 - [x] Auto-save on navigation
+- [x] **Auto-rotation** (portrait AND landscape modes)
+- [x] **Customer name auto-fill** from invoice data
+- [x] **Fullscreen signing mode** (no app header overlap)
+- [x] **Delivery Acceptance Form generation**:
+  - Full terms and conditions
+  - Customer printed name
+  - Warranty information
+  - Letter-size format (1275x1650 at 150 DPI)
+  - Professional legal document export
 
 ### 🗺️ Route Optimization - ENHANCED Jan 19, 2026 🆕
 

@@ -1,6 +1,6 @@
 # Mobile Invoice OCR - Current Status & Setup
 
-**Last Updated:** January 30, 2026 - Production Ready
+**Last Updated:** February 3, 2026 - Production Ready (v1.3.0)
 
 ## ✅ What's Working (Production Ready)
 
@@ -13,11 +13,15 @@
 - **Data Validation**: Required field validation and error handling
 - **Invoice List**: RecyclerView with cards displaying customer info
 
-### POD & Signature (FIXED - Jan 15)
+### POD & Signature (ENHANCED - Feb 3) 🆕
 - **POD Photo Capture**: 3 independent photo slots with smart assignment
 - **Individual Photo Management**: Long-press to view, replace, or delete each photo
 - **Signature Capture**: SignatureView with save to database
 - **Persistent Storage**: All photos and signatures auto-save and persist across sessions
+- **Auto-Rotating Signature Pad**: Works in portrait AND landscape modes
+- **Customer Name Auto-Fill**: Pre-populates from invoice data
+- **Delivery Acceptance Form**: Full legal document with terms exported (not just raw signature)
+- **Fullscreen Signing**: Distraction-free signature capture
 
 ### Route Optimization (ENHANCED - Jan 19) 🆕
 - **Split-Screen UI**: Map on top, interactive delivery list on bottom
@@ -97,7 +101,32 @@ End of Day:
 
 ## ✨ Recent Updates
 
-### NEW: UI Polish & Black/Gold Theme (January 30, 2026) 🆕
+### NEW: Signature Pad & Delivery Form Export (February 3, 2026) 🆕
+
+✅ **Enhanced Signature Pad**:
+   - Auto-rotation for portrait AND landscape modes
+   - Customer name auto-filled from invoice data
+   - Removed driver signature box (customer only)
+   - Fullscreen mode with no app header overlap
+   - Date auto-populated
+
+✅ **Delivery Acceptance Form Export**:
+   - Full terms and conditions embedded in exported document
+   - Customer printed name included
+   - Warranty information
+   - Professional Letter-size format (1275x1650 at 150 DPI)
+   - Exports complete legal document, not just raw signature
+
+✅ **Updated Build Tools**:
+   - Android Gradle Plugin 8.8.0
+   - Compile/Target SDK 35
+   - Java 17
+   - All AndroidX libraries updated
+
+✅ **Route Optimization UX**:
+   - Stays on screen after "Apply Order" (no longer returns to main)
+
+### Previous: UI Polish & Black/Gold Theme (January 30, 2026)
 
 ✅ **Premium Black & Gold Icon**:
    - Glossy black background with subtle light reflections
@@ -448,5 +477,5 @@ adb install app\build\outputs\apk\debug\app-debug.apk
 ---
 
 **Status:** ✅ **Production Ready** - All core features implemented and tested.
-**Current Version:** 1.2.3
+**Current Version:** 1.3.0
 **Platform:** Android 8.0+ (API 26+)

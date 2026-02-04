@@ -35,8 +35,8 @@ public class RouteOptimizer {
         public int orderIndex;
 
         // New fields for ETA and stop time
-        public int stopTimeMinutes = 15;  // Default stop time
-        public double distanceFromPrevious = 0;  // Distance from previous stop (km)
+        public int stopTimeMinutes = 30;  // Default stop time (30 min for appliance delivery)
+        public double distanceFromPrevious = 0;  // Distance from previous stop (miles)
         public long etaMillis = 0;  // Estimated arrival time in milliseconds
         public int priority = PRIORITY_NORMAL;  // Delivery priority
         public int travelTimeMinutes = 0;  // Travel time from previous stop
@@ -46,6 +46,8 @@ public class RouteOptimizer {
             this.latitude = lat;
             this.longitude = lng;
             this.formattedAddress = address;
+            // Load stop time from invoice (persisted value)
+            this.stopTimeMinutes = invoice.getStopTimeMinutes();
         }
 
         /**
@@ -159,7 +161,7 @@ public class RouteOptimizer {
         route.orderedPoints = optimizedPoints;
         route.totalDistance = totalDist;
         route.totalStops = optimizedPoints.size();
-        route.summary = String.format("Total: %.1f km | %d stops", totalDist, optimizedPoints.size());
+        route.summary = String.format("Total: %.1f mi | %d stops", totalDist, optimizedPoints.size());
 
         Log.d(TAG, "Route optimization complete: " + route.summary);
 
@@ -282,10 +284,10 @@ public class RouteOptimizer {
     
     /**
      * Calculate distance between two lat/lng points using Haversine formula
-     * @return distance in kilometers
+     * @return distance in miles
      */
     public static double calculateDistance(double lat1, double lng1, double lat2, double lng2) {
-        final double EARTH_RADIUS = 6371; // km
+        final double EARTH_RADIUS = 3959; // miles
         
         double dLat = Math.toRadians(lat2 - lat1);
         double dLng = Math.toRadians(lng2 - lng1);
@@ -302,20 +304,20 @@ public class RouteOptimizer {
     /**
      * Format distance for display
      */
-    public static String formatDistance(double kilometers) {
-        if (kilometers < 1) {
-            return String.format("%.0f m", kilometers * 1000);
+    public static String formatDistance(double miles) {
+        if (miles < 0.1) {
+            return String.format("%.0f ft", miles * 5280);
         } else {
-            return String.format("%.1f km", kilometers);
+            return String.format("%.1f mi", miles);
         }
     }
     
     /**
      * Estimate travel time (assuming average speed)
      */
-    public static String estimateTravelTime(double kilometers) {
-        final double AVG_SPEED_KMH = 40; // Average delivery speed
-        double hours = kilometers / AVG_SPEED_KMH;
+    public static String estimateTravelTime(double miles) {
+        final double AVG_SPEED_MPH = 25; // Average delivery speed in mph
+        double hours = miles / AVG_SPEED_MPH;
         int minutes = (int) (hours * 60);
 
         if (minutes < 60) {
@@ -330,9 +332,9 @@ public class RouteOptimizer {
     /**
      * Estimate travel time in minutes
      */
-    public static int estimateTravelTimeMinutes(double kilometers) {
-        final double AVG_SPEED_KMH = 40; // Average delivery speed
-        double hours = kilometers / AVG_SPEED_KMH;
+    public static int estimateTravelTimeMinutes(double miles) {
+        final double AVG_SPEED_MPH = 25; // Average delivery speed in mph
+        double hours = miles / AVG_SPEED_MPH;
         return Math.max(1, (int) (hours * 60)); // At least 1 minute
     }
 

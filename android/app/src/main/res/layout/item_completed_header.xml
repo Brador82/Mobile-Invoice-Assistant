@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="12dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginHorizontal="8dp"
+    android:background="#0D0D0D"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- Expand/Collapse Arrow -->
+    <ImageView
+        android:id="@+id/ivExpandArrow"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@android:drawable/arrow_down_float"
+        app:tint="#888888"
+        android:rotation="0" />
+
+    <!-- Header Title -->
+    <TextView
+        android:id="@+id/tvHeaderTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="8dp"
+        android:text="Completed"
+        android:textColor="#888888"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <!-- Count Badge -->
+    <TextView
+        android:id="@+id/tvCompletedCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/circle_background"
+        android:gravity="center"
+        android:minWidth="24dp"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="2dp"
+        android:text="0"
+        android:textColor="#888888"
+        android:textSize="12sp" />
+
+</LinearLayout>

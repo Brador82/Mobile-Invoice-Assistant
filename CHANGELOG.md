@@ -5,6 +5,43 @@ All notable changes to Mobile Invoice OCR will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-02-03
+
+### Added
+- ✍️ **Enhanced Signature Pad**: Complete redesign for better workflow
+  - Auto-rotation support (portrait AND landscape modes)
+  - Customer name auto-filled from invoice data
+  - Delivery date auto-populated
+  - Removed driver signature (customer signature only)
+  - Fullscreen mode for distraction-free signing
+
+- 📄 **Delivery Acceptance Form Export**: Professional document generation
+  - Full terms and conditions embedded in export
+  - Customer signature with printed name
+  - Warranty information included
+  - Letter-size format (1275x1650 pixels at 150 DPI)
+  - Exports as complete legal document, not just raw signature
+
+### Changed
+- 🔧 **Updated Dependencies**: Latest Android tooling
+  - Android Gradle Plugin: 8.7.3 → 8.8.0
+  - Compile SDK: 34 → 35
+  - Target SDK: 34 → 35
+  - Java: 8 → 17
+  - All AndroidX libraries updated to latest versions
+
+- 🗺️ **Route Optimization UX**: Stays on screen after applying order
+  - No longer returns to main screen after "Apply Order"
+  - Can continue adjusting route without navigation
+
+### Fixed
+- 🐛 **Signature Form Header Overlap**: Fixed app header covering signature form
+  - Added fullscreen theme for SignatureActivity
+  - Added `fitsSystemWindows="true"` to layouts
+
+- 🐛 **Export Missing Customer Name**: Customer name now shows in exported form
+  - Fixed intent extras passing from InvoiceDetailActivity
+
 ## [1.2.3] - 2026-01-30
 
 ### Added
@@ -324,6 +361,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Status | Notes |
 |---------|------|--------|-------|
+| 1.3.0 | 2026-02-03 | ✅ Released | Signature pad redesign, delivery form export |
 | 1.2.3 | 2026-01-30 | ✅ Released | Black/gold theme, delivery checkbox, OCR fixes |
 | 1.2.2 | 2026-01-29 | ✅ Released | Icon design system |
 | 1.2.1 | 2026-01-23 | ✅ Released | OCR quality restoration |

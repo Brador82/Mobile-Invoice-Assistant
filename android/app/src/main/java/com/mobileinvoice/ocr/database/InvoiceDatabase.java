@@ -9,7 +9,7 @@ import androidx.room.RoomDatabase;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {Invoice.class}, version = 4, exportSchema = false)
+@Database(entities = {Invoice.class}, version = 5, exportSchema = false)
 public abstract class InvoiceDatabase extends RoomDatabase {
     private static InvoiceDatabase instance;
 
@@ -46,7 +46,7 @@ public abstract class InvoiceDatabase extends RoomDatabase {
                     "rawOcrText TEXT, " +
                     "timestamp INTEGER NOT NULL, " +
                     "status TEXT)");
-            
+
             // Copy data from old table
             database.execSQL("INSERT INTO invoices_new (id, invoiceNumber, customerName, address, " +
                     "phone, items, podImagePath1, podImagePath2, podImagePath3, signatureImagePath, " +
@@ -54,12 +54,21 @@ public abstract class InvoiceDatabase extends RoomDatabase {
                     "SELECT id, invoiceNumber, customerName, address, phone, items, podImagePath1, " +
                     "podImagePath2, podImagePath3, signatureImagePath, notes, originalImagePath, " +
                     "rawOcrText, timestamp, status FROM invoices");
-            
+
             // Drop old table
             database.execSQL("DROP TABLE invoices");
-            
+
             // Rename new table to original name
             database.execSQL("ALTER TABLE invoices_new RENAME TO invoices");
+        }
+    };
+
+    // Migration from version 4 to 5: Add stopTimeMinutes column for route stop duration
+    private static final Migration MIGRATION_4_5 = new Migration(4, 5) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            // Add stopTimeMinutes column with default value of 30 minutes
+            database.execSQL("ALTER TABLE invoices ADD COLUMN stopTimeMinutes INTEGER NOT NULL DEFAULT 30");
         }
     };
 
@@ -70,7 +79,7 @@ public abstract class InvoiceDatabase extends RoomDatabase {
                     InvoiceDatabase.class,
                     "invoice_database"
             )
-                    .addMigrations(MIGRATION_2_3, MIGRATION_3_4)
+                    .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                     .fallbackToDestructiveMigration()
                     .build();
         }

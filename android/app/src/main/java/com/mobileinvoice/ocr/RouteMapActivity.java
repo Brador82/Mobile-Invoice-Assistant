@@ -193,6 +193,12 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
     private void handleStopTimeChanged(RouteOptimizer.RoutePoint stop, int newTimeMinutes) {
         stop.stopTimeMinutes = newTimeMinutes;
 
+        // Save to database for persistence
+        stop.invoice.setStopTimeMinutes(newTimeMinutes);
+        new Thread(() -> {
+            database.invoiceDao().update(stop.invoice);
+        }).start();
+
         // Recalculate ETAs for all subsequent stops
         recalculateETAsAndRefresh();
     }
@@ -330,14 +336,14 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
 
         if (endTime != null && !endTime.equals("N/A")) {
             summary = String.format(
-                "Optimized Route\n%d stops • %.1f km • Finish by %s",
+                "Optimized Route\n%d stops • %.1f mi • Finish by %s",
                 optimizedRoute.orderedPoints.size(),
                 optimizedRoute.totalDistance,
                 endTime
             );
         } else {
             summary = String.format(
-                "Optimized Route\n%d stops • %.1f km • %s estimated",
+                "Optimized Route\n%d stops • %.1f mi • %s estimated",
                 optimizedRoute.orderedPoints.size(),
                 optimizedRoute.totalDistance,
                 RouteOptimizer.estimateTravelTime(optimizedRoute.totalDistance)
@@ -582,7 +588,7 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
                     
                     // Update summary
                     String summary = String.format(
-                        "Optimized Route\n%d stops • %.1f km • %s estimated",
+                        "Optimized Route\n%d stops • %.1f mi • %s estimated",
                         optimizedRoute.totalStops,
                         optimizedRoute.totalDistance,
                         RouteOptimizer.estimateTravelTime(optimizedRoute.totalDistance)
@@ -750,11 +756,8 @@ public class RouteMapActivity extends AppCompatActivity implements OnMapReadyCal
 
                 runOnUiThread(() -> {
                     Toast.makeText(this,
-                        "Route order saved! " + optimizedRoute.totalStops + " stops reordered",
-                        Toast.LENGTH_LONG).show();
-
-                    // Return to main activity
-                    finish();
+                        "Route order applied! " + optimizedRoute.totalStops + " stops reordered",
+                        Toast.LENGTH_SHORT).show();
                 });
 
             } catch (Exception e) {

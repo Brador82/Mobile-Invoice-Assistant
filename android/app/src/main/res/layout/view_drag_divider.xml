@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Drag divider for resizing map/content split ratio -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dragDivider"
+    android:layout_width="match_parent"
+    android:layout_height="24dp"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@color/dark_background"
+    android:visibility="gone">
+
+    <!-- Drag handle indicator -->
+    <View
+        android:layout_width="48dp"
+        android:layout_height="4dp"
+        android:background="@drawable/drag_handle_indicator" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="drag to resize"
+        android:textSize="9sp"
+        android:textColor="@color/medium_gray"
+        android:layout_marginTop="2dp" />
+
+</LinearLayout>

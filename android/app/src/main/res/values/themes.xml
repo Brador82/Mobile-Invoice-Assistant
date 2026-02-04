@@ -27,6 +27,14 @@
         <item name="android:textColorHint">@color/medium_tan</item>
     </style>
 
+    <!-- Fullscreen theme for signature capture -->
+    <style name="Theme.MobileInvoiceOCR.Fullscreen" parent="Theme.MobileInvoiceOCR">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
     <style name="ButtonStyle" parent="Widget.MaterialComponents.Button">
         <item name="android:layout_margin">8dp</item>
         <item name="android:padding">12dp</item>

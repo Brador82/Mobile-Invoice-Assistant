@@ -474,24 +474,24 @@ public class ExportHelper {
             }
         }
 
-        // Signature
+        // Delivery Acceptance Form (includes signature and terms)
         if (invoice.getSignatureImagePath() != null && !invoice.getSignatureImagePath().isEmpty()) {
-            checkNewPage.run();
-            canvas[0].drawText("Customer Signature", margin, currentY[0], headerPaint);
-            currentY[0] += 15;
+            // Start on a new page for the delivery acceptance form
+            document.finishPage(currentPage[0]);
+            pageNum[0]++;
+            currentPage[0] = document.startPage(new PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNum[0]).create());
+            canvas[0] = currentPage[0].getCanvas();
+            currentY[0] = 30;
 
-            Bitmap sigImg = loadAndScaleImage(invoice.getSignatureImagePath(), contentWidth / 2, 100);
-            if (sigImg != null) {
-                if (currentY[0] + sigImg.getHeight() > pageHeight - 80) {
-                    document.finishPage(currentPage[0]);
-                    pageNum[0]++;
-                    currentPage[0] = document.startPage(new PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNum[0]).create());
-                    canvas[0] = currentPage[0].getCanvas();
-                    currentY[0] = 50;
-                }
-                canvas[0].drawBitmap(sigImg, margin, currentY[0], null);
-                currentY[0] += sigImg.getHeight() + 20;
-                sigImg.recycle();
+            canvas[0].drawText("Delivery Acceptance Form", margin, currentY[0], headerPaint);
+            currentY[0] += 20;
+
+            // Load the full form image (larger size since it's a full document with terms)
+            Bitmap formImg = loadAndScaleImage(invoice.getSignatureImagePath(), contentWidth, pageHeight - 100);
+            if (formImg != null) {
+                canvas[0].drawBitmap(formImg, margin, currentY[0], null);
+                currentY[0] += formImg.getHeight() + 20;
+                formImg.recycle();
             }
         }
 
@@ -773,13 +773,13 @@ public class ExportHelper {
             html.append("</div>\n");
         }
         
-        // Signature
+        // Delivery Acceptance Form (includes signature and terms)
         if (invoice.getSignatureImagePath() != null && !invoice.getSignatureImagePath().isEmpty()) {
             String base64 = imageToBase64(invoice.getSignatureImagePath());
             if (base64 != null) {
-                html.append("<h2>").append(ICON_SIGNATURE).append("Customer Signature</h2>\n");
+                html.append("<h2>").append(ICON_SIGNATURE).append("Delivery Acceptance Form</h2>\n");
                 html.append("<div class='image-section'>\n");
-                html.append("<img src='data:image/jpeg;base64,").append(base64).append("' alt='Signature'>\n");
+                html.append("<img src='data:image/jpeg;base64,").append(base64).append("' alt='Delivery Acceptance Form'>\n");
                 html.append("</div>\n");
             }
         }

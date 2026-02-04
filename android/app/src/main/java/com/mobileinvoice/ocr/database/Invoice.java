@@ -24,10 +24,12 @@ public class Invoice {
     private String rawOcrText;
     private long timestamp;
     private String status; // Values: "PENDING", "IN_TRANSIT", "DELIVERED", "CANCELLED"
+    private int stopTimeMinutes = 30; // Default 30 minutes for appliance delivery
 
     public Invoice() {
         this.timestamp = System.currentTimeMillis();
         this.status = "PENDING"; // Default to PENDING
+        this.stopTimeMinutes = 30; // Default 30 minutes
     }
 
     // Getters
@@ -46,6 +48,7 @@ public class Invoice {
     public String getRawOcrText() { return rawOcrText; }
     public long getTimestamp() { return timestamp; }
     public String getStatus() { return status; }
+    public int getStopTimeMinutes() { return stopTimeMinutes; }
 
     // Setters
     public void setId(int id) { this.id = id; }
@@ -63,6 +66,7 @@ public class Invoice {
     public void setRawOcrText(String rawOcrText) { this.rawOcrText = rawOcrText; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
     public void setStatus(String status) { this.status = status; }
+    public void setStopTimeMinutes(int stopTimeMinutes) { this.stopTimeMinutes = stopTimeMinutes; }
 
     // Utility methods for status checking
     public boolean isCompleted() {
