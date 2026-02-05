@@ -1,0 +1,65 @@
+{
+  "grid": {
+    "cols": 100,
+    "rows": 140
+  },
+  "reference_width": 3000,
+  "reference_height": 4000,
+  "fields": [
+    {
+      "name": "invoice_number",
+      "type": "invoice_number",
+      "coords": {
+        "x1": 72,
+        "y1": 92,
+        "x2": 75,
+        "y2": 106
+      },
+      "outputColumn": "A"
+    },
+    {
+      "name": "customer_name",
+      "type": "customer_name",
+      "coords": {
+        "x1": 57,
+        "y1": 12,
+        "x2": 61,
+        "y2": 33
+      },
+      "outputColumn": "B"
+    },
+    {
+      "name": "customer_address",
+      "type": "customer_address",
+      "coords": {
+        "x1": 55,
+        "y1": 15,
+        "x2": 55,
+        "y2": 15
+      },
+      "outputColumn": "C"
+    },
+    {
+      "name": "customer_address",
+      "type": "customer_address",
+      "coords": {
+        "x1": 55,
+        "y1": 16,
+        "x2": 57,
+        "y2": 57
+      },
+      "outputColumn": "D"
+    },
+    {
+      "name": "phone",
+      "type": "phone",
+      "coords": {
+        "x1": 52,
+        "y1": 12,
+        "x2": 55,
+        "y2": 30
+      },
+      "outputColumn": "E"
+    }
+  ]
+}

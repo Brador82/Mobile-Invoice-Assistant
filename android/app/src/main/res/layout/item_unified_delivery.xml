@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="6dp"
+    android:layout_marginVertical="1dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="#1A1A1A">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/gradient_card_route">
+
+        <!-- Main Content Row (Always Visible) -->
+        <LinearLayout
+            android:id="@+id/mainContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="10dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="4dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
+
+            <!-- Letter Badge (Gold Circle) - A, B, C... -->
+            <TextView
+                android:id="@+id/tvLetterBadge"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/circle_background_gold"
+                android:gravity="center"
+                android:text="A"
+                android:textColor="#1A1A1A"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <!-- Delivery Details Column -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <!-- Invoice Number (Small, above name) -->
+                <TextView
+                    android:id="@+id/tvInvoiceNumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="INV-123456"
+                    android:textColor="#999999"
+                    android:textSize="11sp" />
+
+                <!-- Customer Name (Gold) -->
+                <TextView
+                    android:id="@+id/tvCustomerName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Customer Name"
+                    android:textColor="#D4AF37"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
+                <!-- Address (White, Clickable) -->
+                <TextView
+                    android:id="@+id/tvAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:text="123 Main Street, City, ST 12345"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp" />
+
+                <!-- View Details Button -->
+                <TextView
+                    android:id="@+id/tvViewDetails"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="VIEW DETAILS"
+                    android:textColor="#D4AF37"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:padding="4dp" />
+
+                <!-- ETA Row -->
+                <LinearLayout
+                    android:id="@+id/etaRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:visibility="gone">
+
+                    <!-- ETA Badge -->
+                    <TextView
+                        android:id="@+id/tvETA"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/badge_eta"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
+                        android:text="ETA: 10:30 AM"
+                        android:textColor="#FFD700"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <!-- Stop Time -->
+                    <TextView
+                        android:id="@+id/tvStopTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="(30 min stop)"
+                        android:textColor="#999999"
+                        android:textSize="11sp" />
+
+                    <!-- Priority Badge (if set) -->
+                    <TextView
+                        android:id="@+id/tvPriorityBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/badge_priority"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="6dp"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
+                        android:text="FIRST"
+                        android:textColor="#1A1A1A"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Action Buttons Column (Call, Navigate, Complete) -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/actionButtonsColumn"
+                android:layout_width="52dp"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+
+                <!-- Call Button -->
+                <ImageButton
+                    android:id="@+id/btnCall"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Call customer"
+                    android:src="@android:drawable/ic_menu_call"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/btnNavigate"
+                    app:layout_constraintVertical_chainStyle="spread"
+                    app:tint="#4CAF50" />
+
+                <!-- Navigate Button -->
+                <ImageButton
+                    android:id="@+id/btnNavigate"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Navigate to this stop"
+                    android:src="@android:drawable/ic_menu_directions"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/btnCall"
+                    app:layout_constraintBottom_toTopOf="@id/cbCompleted"
+                    app:tint="#2196F3" />
+
+                <!-- Completed Checkbox (gold) -->
+                <CheckBox
+                    android:id="@+id/cbCompleted"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginBottom="4dp"
+                    android:button="@null"
+                    android:background="@drawable/checkbox_completed"
+                    android:contentDescription="Mark delivery completed"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Control Column (top: expand, center: drag handle) -->
+            <LinearLayout
+                android:layout_width="36dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_marginStart="4dp">
+
+                <!-- Expand Button (top right) -->
+                <ImageButton
+                    android:id="@+id/btnExpand"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Expand options"
+                    android:src="@android:drawable/arrow_down_float"
+                    app:tint="#D4AF37"
+                    android:visibility="gone" />
+
+                <!-- Drag Handle (below expand) -->
+                <ImageView
+                    android:id="@+id/dragHandle"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginTop="8dp"
+                    android:contentDescription="Drag to reorder"
+                    android:padding="4dp"
+                    android:src="@android:drawable/ic_menu_sort_by_size"
+                    app:tint="#888888"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- ETA Row (moved lower, separate from main content) -->
+        <LinearLayout
+            android:id="@+id/etaRowContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="68dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="8dp"
+            android:gravity="center_vertical"
+            android:visibility="gone">
+
+            <!-- ETA Badge -->
+            <TextView
+                android:id="@+id/tvETABottom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/badge_eta"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:text="ETA: 10:30 AM"
+                android:textColor="#FFD700"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <!-- Stop Time -->
+            <TextView
+                android:id="@+id/tvStopTimeBottom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="(30 min stop)"
+                android:textColor="#999999"
+                android:textSize="11sp" />
+
+            <!-- Priority Badge (if set) -->
+            <TextView
+                android:id="@+id/tvPriorityBadgeBottom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/badge_priority"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:text="FIRST"
+                android:textColor="#1A1A1A"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <!-- Bottom Row: Delete button on left -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="8dp"
+            android:gravity="start|center_vertical">
+
+            <!-- Delete Button (bottom left) -->
+            <ImageButton
+                android:id="@+id/btnDelete"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Delete delivery"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                app:tint="#D32F2F" />
+
+        </LinearLayout>
+
+        <!-- Expandable Options Panel -->
+        <LinearLayout
+            android:id="@+id/expandablePanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:background="#0D0D0D"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp">
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#333333"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Priority Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delivery Priority"
+                android:textColor="#999999"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <!-- Make First Button -->
+                <Button
+                    android:id="@+id/btnMakeFirst"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/button_priority_first"
+                    android:text="Make First"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="false"
+                    android:elevation="2dp" />
+
+                <!-- Make Last Button -->
+                <Button
+                    android:id="@+id/btnMakeLast"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/button_priority_last"
+                    android:text="Make Last"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="false"
+                    android:elevation="2dp" />
+
+                <!-- Clear Priority Button -->
+                <Button
+                    android:id="@+id/btnClearPriority"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:backgroundTint="#444444"
+                    android:text="Clear"
+                    android:textColor="#CCCCCC"
+                    android:textSize="12sp"
+                    android:textAllCaps="false"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+            <!-- Stop Time Adjustment Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Estimated Stop Time"
+                android:textColor="#999999"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <!-- Current Stop Time Display -->
+            <TextView
+                android:id="@+id/tvStopTimeValue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="30 minutes"
+                android:textColor="#D4AF37"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <!-- Time Slider -->
+            <SeekBar
+                android:id="@+id/seekBarStopTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:max="7"
+                android:progress="1"
+                android:progressTint="#D4AF37"
+                android:thumbTint="#D4AF37"
+                android:progressBackgroundTint="#555555" />
+
+            <!-- Time Labels Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="15m"
+                    android:textColor="#888888"
+                    android:textSize="10sp"
+                    android:gravity="start" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="30m"
+                    android:textColor="#888888"
+                    android:textSize="10sp"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="1hr"
+                    android:textColor="#888888"
+                    android:textSize="10sp"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="1h30"
+                    android:textColor="#888888"
+                    android:textSize="10sp"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="2hr"
+                    android:textColor="#888888"
+                    android:textSize="10sp"
+                    android:gravity="end" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

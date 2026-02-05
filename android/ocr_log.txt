@@ -1,0 +1,52 @@
+--------- beginning of main
+01-23 21:49:35.859 20501 21174 D OCRProcessorMLKit: ML Kit OCR Processor initialized - on-device processing
+01-23 21:49:35.859 20501 21174 D OCRProcessorMLKit: Processing image with ML Kit: file:///storage/emulated/0/Android/data/com.mobileinvoice.ocr/files/Pictures/Invoices/IMG_20260123_214542_corrected.jpg
+01-23 21:49:36.429 20501 21174 D OCRProcessorMLKit: Extracted 47 lines from image
+01-23 21:49:36.430 20501 21174 D OCRProcessorMLKit: Fallback invoice candidate in top band: MO65807
+01-23 21:49:36.430 20501 21174 D OCRProcessorMLKit: Found item: APPLIANCES 4 LESS
+01-23 21:49:36.431 20501 21174 D OCRProcessorMLKit: Found item: Appliances and Services (listed b
+01-23 21:49:36.431 20501 21174 D OCRProcessorMLKit: Found 'BILL TO:' at line 10: BILL TO:
+01-23 21:49:36.431 20501 21174 D OCRProcessorMLKit: Name line: Appliances and Services (listed b
+01-23 21:49:36.431 20501 21174 D OCRProcessorMLKit: Address line: Name: JUDY GODDARD (ID:CACREDMF1F1 / Salesperson: KY )
+01-23 21:49:36.431 20501 21174 D OCRProcessorMLKit: Phone line: Address: 904
+01-23 21:49:36.431 20501 21174 D OCRProcessorMLKit: ========= ML KIT EXTRACTION RESULTS =========
+01-23 21:49:36.431 20501 21174 D OCRProcessorMLKit: Invoice #: MO65807
+01-23 21:49:36.431 20501 21174 D OCRProcessorMLKit: Customer: Appliances and Services (listed b
+01-23 21:49:36.431 20501 21174 D OCRProcessorMLKit: Address: Name: JUDY GODDARD (ID:CACREDMF1F1 / Salesperson: KY )
+01-23 21:49:36.431 20501 21174 D OCRProcessorMLKit: Phone: No phone
+01-23 21:49:36.431 20501 21174 D OCRProcessorMLKit: Items: APPLIANCES 4 LESS, Appliances and Services (listed b
+01-23 21:49:36.431 20501 21174 D OCRProcessorMLKit: ============================================
+01-23 21:49:36.432 20501 21174 D OCRProcessorMLKit: Processing image with ML Kit: file:///storage/emulated/0/Android/data/com.mobileinvoice.ocr/files/Pictures/Invoices/IMG_20260123_214553_corrected.jpg
+01-23 21:49:36.838 20501 21174 D OCRProcessorMLKit: Extracted 44 lines from image
+01-23 21:49:36.838 20501 21174 D OCRProcessorMLKit: Fallback invoice candidate in top band: OICE
+01-23 21:49:36.838 20501 21174 D OCRProcessorMLKit: Detected split header anchors for items table
+01-23 21:49:36.839 20501 21174 D OCRProcessorMLKit: Found item: APPLIANCES 4 LESS
+01-23 21:49:36.839 20501 21174 D OCRProcessorMLKit: Found item: Appliances and Services (listed belov
+01-23 21:49:36.839 20501 21174 D OCRProcessorMLKit: Found 'BILL TO:' at line 8: BILL TO:
+01-23 21:49:36.839 20501 21174 D OCRProcessorMLKit: Name line: Appliances and Services (listed belov
+01-23 21:49:36.839 20501 21174 D OCRProcessorMLKit: Address line: Name:JUDY GODDARD (ID:CACREDMF1F1 / Salesperson: KY )
+01-23 21:49:36.839 20501 21174 D OCRProcessorMLKit: Phone line: Address: 904 Elizabeth St, Republic, MO 65738
+01-23 21:49:36.839 20501 21174 D OCRProcessorMLKit: ========= ML KIT EXTRACTION RESULTS =========
+01-23 21:49:36.839 20501 21174 D OCRProcessorMLKit: Invoice #: OICE
+01-23 21:49:36.839 20501 21174 D OCRProcessorMLKit: Customer: Appliances and Services (listed belov
+01-23 21:49:36.839 20501 21174 D OCRProcessorMLKit: Address: Name:JUDY GODDARD (ID:CACREDMF1F1 / Salesperson: KY )
+01-23 21:49:36.839 20501 21174 D OCRProcessorMLKit: Phone: No phone
+01-23 21:49:36.839 20501 21174 D OCRProcessorMLKit: Items: APPLIANCES 4 LESS, Appliances and Services (listed belov
+01-23 21:49:36.839 20501 21174 D OCRProcessorMLKit: ============================================
+01-23 21:49:36.840 20501 21174 D OCRProcessorMLKit: Processing image with ML Kit: file:///storage/emulated/0/Android/data/com.mobileinvoice.ocr/files/Pictures/Invoices/IMG_20260123_214933_corrected.jpg
+01-23 21:49:37.239 20501 21174 D OCRProcessorMLKit: Extracted 47 lines from image
+01-23 21:49:37.240 20501 21174 D OCRProcessorMLKit: Fallback invoice candidate in top band: OICE
+01-23 21:49:37.240 20501 21174 D OCRProcessorMLKit: Detected split header anchors for items table
+01-23 21:49:37.240 20501 21174 D OCRProcessorMLKit: Found item: APPLIANCES 4 LESS
+01-23 21:49:37.240 20501 21174 D OCRProcessorMLKit: Found item: Appliances and Services (listed below)
+01-23 21:49:37.240 20501 21174 D OCRProcessorMLKit: Found 'BILL TO:' at line 12: BILL TO:
+01-23 21:49:37.240 20501 21174 D OCRProcessorMLKit: Name line: Warranty Details
+01-23 21:49:37.240 20501 21174 D OCRProcessorMLKit: Address line: Phone: 417-599-9984 Email: ochiengjudy@hotmail.com
+01-23 21:49:37.240 20501 21174 D OCRProcessorMLKit: Phone line: Price
+01-23 21:49:37.240 20501 21174 D OCRProcessorMLKit: ========= ML KIT EXTRACTION RESULTS =========
+01-23 21:49:37.240 20501 21174 D OCRProcessorMLKit: Invoice #: OICE
+01-23 21:49:37.240 20501 21174 D OCRProcessorMLKit: Customer: Warranty Details
+01-23 21:49:37.240 20501 21174 D OCRProcessorMLKit: Address: Phone: 417-599-9984
+01-23 21:49:37.240 20501 21174 D OCRProcessorMLKit: Phone: No phone
+01-23 21:49:37.240 20501 21174 D OCRProcessorMLKit: Items: APPLIANCES 4 LESS, Appliances and Services (listed below)
+01-23 21:49:37.240 20501 21174 D OCRProcessorMLKit: ============================================

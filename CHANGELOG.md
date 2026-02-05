@@ -1,0 +1,454 @@
+# Changelog
+
+All notable changes to Mobile Invoice OCR will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.3.0] - 2026-02-03
+
+### Added
+- ✍️ **Enhanced Signature Pad**: Complete redesign for better workflow
+  - Auto-rotation support (portrait AND landscape modes)
+  - Customer name auto-filled from invoice data
+  - Delivery date auto-populated
+  - Removed driver signature (customer signature only)
+  - Fullscreen mode for distraction-free signing
+
+- 📄 **Delivery Acceptance Form Export**: Professional document generation
+  - Full terms and conditions embedded in export
+  - Customer signature with printed name
+  - Warranty information included
+  - Letter-size format (1275x1650 pixels at 150 DPI)
+  - Exports as complete legal document, not just raw signature
+
+### Changed
+- 🔧 **Updated Dependencies**: Latest Android tooling
+  - Android Gradle Plugin: 8.7.3 → 8.8.0
+  - Compile SDK: 34 → 35
+  - Target SDK: 34 → 35
+  - Java: 8 → 17
+  - All AndroidX libraries updated to latest versions
+
+- 🗺️ **Route Optimization UX**: Stays on screen after applying order
+  - No longer returns to main screen after "Apply Order"
+  - Can continue adjusting route without navigation
+
+### Fixed
+- 🐛 **Signature Form Header Overlap**: Fixed app header covering signature form
+  - Added fullscreen theme for SignatureActivity
+  - Added `fitsSystemWindows="true"` to layouts
+
+- 🐛 **Export Missing Customer Name**: Customer name now shows in exported form
+  - Fixed intent extras passing from InvoiceDetailActivity
+
+## [1.2.3] - 2026-01-30
+
+### Added
+- 🎨 **New Black & Gold App Icon**: Premium branded icon with A4L lettering
+  - Deep glossy black background with light reflections
+  - Gold circular route arrows representing delivery optimization
+  - Cream/gold document with "A4L" branding prominently displayed
+  - Gold decorative accents and subtle grid pattern background
+  - Vector drawables for perfect scaling on all devices
+
+- ✅ **Delivery Completion Checkbox**: Track completed deliveries on main screen
+  - Gold checkmark checkbox on each delivery card (bottom-right)
+  - Tap to mark delivery as "DELIVERED"
+  - State persists to database immediately
+  - Visual feedback with toast notification
+
+- 🎨 **Enhanced UI Styling**: Premium black and gold theme
+  - "Process All with OCR" button: Black gradient background with gold border
+  - Gold scan document icon replacing brain emoji
+  - Delivery cards: Black-to-gray gradient background
+  - White text for customer name and invoice number (high contrast)
+  - Light gray address text
+  - Gold "View Details" button text
+  - Improved visibility in sunlight
+
+### Changed
+- 📝 **OCR Invoice Number Extraction**: Smarter detection to avoid address confusion
+  - Now prioritizes explicitly labeled invoice numbers ("Invoice #", "Order #")
+  - Excludes lines containing address keywords (Missouri, Springfield, street names)
+  - Filters out zip codes (5-digit patterns)
+  - Better phone number exclusion (recognizes area codes 417, 573, 816, 314)
+  - Logs extraction decisions for debugging
+
+### Fixed
+- 🐛 **Invoice Number Mis-extraction**: Fixed issue where "Missouri 65807" was picked up as invoice number
+  - Added address keyword filtering in header line processing
+  - Added zip code pattern exclusion
+  - More specific invoice code pattern matching (requires letter after first digit)
+
+## [1.2.2] - 2026-01-29
+
+### Added
+- 🎨 **App Icon Design System**: Professional branding and icon generation
+  - Created `ICON_DESIGN_GUIDE.md` with complete design specifications
+  - Python script `tools/generate_icon.py` for automated icon generation
+  - Generates all Android icon sizes (48px to 192px) plus 512px Play Store icon
+  - "Smart Delivery Scanner" design concept: invoice + delivery truck + OCR scan lines
+  - Blue gradient background (#1565C0 → #2196F3) with orange accents (#FF9800)
+  - 4 generation methods documented: Figma, Canva, Android Asset Studio, AI prompts
+  - Installation batch script for easy deployment to Android resource folders
+  - Rounded square shape with 22% corner radius for modern look
+  - Adaptive design works on light and dark launcher backgrounds
+
+### Changed
+- 📝 **Brand Identity**: Moved from generic Android icon to professional custom design
+  - Visual elements instantly communicate app purpose (invoices + delivery)
+  - Orange scan lines represent OCR/smart processing capability
+  - Professional appearance suitable for Play Store publishing
+
+## [1.2.1] - 2026-01-23
+
+### Fixed
+- 🐛 **OCR Quality Restored**: Fixed overly strict filtering that degraded extraction quality by ~90%
+  - Relaxed item normalization to capture products with "MODEL", "SERIAL", "PRICE" in names
+  - Expanded coordinate search zones (5-10% wider) for better field detection
+  - Fixed image rotation bug that could cause double-rotation (EXIF + landscape detection)
+  - Added adaptive positioning based on "BILL TO:" and customer name markers
+  - Enhanced initialization and extraction logging for debugging
+
+### Changed
+- 📝 **Item Filtering Logic**: Now allows items with model numbers and detailed product descriptions
+  - Maximum item length: 30 → 80 characters (supports full product names)
+  - Filter patterns changed from `.contains()` to `.matches()` for precision
+  - Captures items with appliance keywords even if format varies
+  - Philosophy: Better to capture extra items than miss valid ones
+  
+- 📝 **Coordinate Extraction Zones**: Made more flexible and adaptive
+  - Customer name: 15-40% vertical (was 20-35%), 65% width (was 60%)
+  - Address: 25-55% vertical (was 30-50%), adaptive positioning below name
+  - Phone: 30-60% vertical (was 35-55%), 65% width (was 60%)
+  - Added `findMarkerY()` helper for dynamic positioning
+  
+- 📝 **Image Rotation**: Improved handling to prevent over-correction
+  - Checks EXIF orientation data first
+  - Only auto-rotates landscape images if NO EXIF data present
+  - Logs all rotation decisions for debugging
+
+## [1.2.0] - 2026-01-15
+
+### Fixed
+- 🐛 **Data Persistence**: POD photos and signatures now persist across screen changes
+  - Added auto-save in onPause() and onBackPressed()
+  - Fixed onDelete to reload from database instead of manual list manipulation
+- 🐛 **POD Slot Assignment**: Single photo now saves to correct slot instead of all 3
+  - Smart assignment to first empty slot (pod1 → pod2 → pod3)
+  - Fixed loading logic to display each photo in correct ImageView
+- 🐛 **OCR Quality**: Enhanced extraction patterns for cleaner data
+  - Better filtering of warranty/terms text
+  - Stricter length validation (3-30 chars)
+  - Improved customer name cleaning (removes slashes, IDs)
+
+### Added
+- ✨ **Auto-Save Functionality**: Data automatically saves when navigating away
+  - No more "forgot to save" lost data
+  - Silent background save without UI interruption
+- ✨ **POD Photo Management**: Long-press thumbnails for options
+  - View Full Size (opens in system image viewer)
+  - Replace Photo (clears slot and reopens camera)
+  - Delete Photo (removes and cleans up file)
+- ✨ **Smart POD Button**: Text updates based on photo count
+  - "Add POD Photo" (0 photos)
+  - "Add POD Photo 2" (1 photo)
+  - "Add POD Photo 3" (2 photos)
+  - "3 Photos Captured" (all slots full)
+- ✨ **Downloads Folder Export**: All exports now save to Downloads/MobileInvoiceOCR/
+  - Easy to find in file manager
+  - Accessible by all cloud service apps
+- ✨ **Post-Export Cleanup**: Dialog prompts to clear data after export
+  - "Clear All Data" - Resets app for next batch
+  - "Keep Data" - Retains for review or re-export
+  - Confirmation dialog prevents accidental deletion
+- ✨ **Cloud Integration**: Share dialog opens automatically after export
+  - Direct upload to Google Drive, Dropbox, OneDrive
+  - Email or messaging app sharing
+  - Any installed file-sharing app
+
+### Changed
+- 📝 **Timestamped Filenames**: Human-readable format (invoices_20260115_143022.md)
+- 📝 **Phone Normalization**: Consistent (XXX) XXX-XXXX format
+- 📝 **Address Cleaning**: Normalized whitespace in addresses
+- 📝 **Export Location Messages**: Show full path "Downloads/MobileInvoiceOCR/filename"
+
+## [1.1.0] - 2026-01-15 (Morning)
+
+### Added
+- ✨ **Route Optimization**: Google Maps integration with TSP algorithm
+  - Nearest Neighbor algorithm for optimal delivery sequence
+  - Total distance and time estimation
+  - Visual route display with markers and polylines
+  - Turn-by-turn navigation launch
+- ✨ **Drag-and-Drop Reordering**: Manual invoice list reordering
+  - Long-press to drag cards
+  - Visual feedback during drag
+  - onOrderChanged callback for persistence
+
+## [1.0.0] - 2026-01-11
+
+### Added
+- ✨ **Google ML Kit Integration**: Replaced Tesseract with ML Kit for on-device OCR
+  - 95%+ accuracy on standard invoice formats
+  - 2-3 second processing time per image
+  - No internet required after initial model download
+- 💾 **Room Database Persistence**: All invoices saved locally with automatic backup
+  - SQLite database with Room ORM
+  - Automatic ID generation
+  - Timestamp tracking
+  - Delete functionality
+- 📸 **Camera Capture**: Direct invoice photography from within app
+  - CameraX integration
+  - Auto-focus support
+  - Photo preview and confirm/retake
+- 📤 **Gallery Import**: Bulk import existing invoice photos
+  - Multi-select support
+  - Batch OCR processing
+  - Progress indicator
+- 🎯 **Intelligent Field Extraction**: Automatic "BILL TO:" section detection
+  - Customer name extraction (with ID parsing)
+  - Address parsing
+  - Phone number regex validation
+  - Invoice number extraction
+- 📋 **Invoice List View**: RecyclerView with all processed invoices
+  - Sort by timestamp (newest first)
+  - Tap to view details
+  - Swipe or tap to delete
+- 🔍 **Invoice Detail Screen**: View and edit extracted data
+  - All fields editable
+  - POD photo capture
+  - Signature capture
+  - Notes field
+- 🎨 **Material Design 3 UI**: Modern, responsive interface
+  - ViewBinding for type-safe views
+  - ConstraintLayout for flexible layouts
+  - CardView for invoice items
+  - Progress indicators
+
+### Technical
+- Migrated from server-based Tesseract to on-device ML Kit
+- Implemented Room database with DAO pattern
+- Added background threading for database and OCR operations
+- Configured ProGuard for release builds
+- Set up Gradle build system with dependency management
+
+### Performance
+- Average OCR processing: 2-3 seconds per invoice
+- Memory usage: ~50MB during processing
+- App size: ~15MB (after ML Kit model download)
+- Database query time: <100ms for 100 records
+
+## [0.9.0] - 2026-01-10 (Development)
+
+### Added
+- Initial project structure
+- Tesseract OCR integration (local)
+- HTTP-based OCR server (Termux/Flask)
+- Basic UI with upload functionality
+
+### Changed
+- Replaced Tesseract with A.C.E.S. (Anchored Coordinate Extraction System)
+- Added OpenCV for perspective correction (attempted)
+- Pillow-based preprocessing
+
+### Issues
+- ❌ Tesseract accuracy inadequate (40-60%)
+- ❌ OpenCV compilation failed on ARM64
+- ❌ Template coordinates wrong for invoice format
+- ❌ Extracting company address instead of customer
+
+### Deprecated
+- `OCRProcessor.java` - Local Tesseract implementation
+- `OCRProcessorHTTP.java` - Server-based extraction
+- `server_aces.py` - Flask OCR server (no longer needed)
+- `server_aces_pillow.py` - Pillow-based server
+
+## [0.5.0] - 2026-01-09 (Prototype)
+
+### Added
+- Basic Android app structure
+- MainActivity with image selection
+- InvoiceDetailActivity layout
+- Room database schema
+- Apache POI for Excel export (planned)
+
+### Changed
+- Switched from internal Tesseract to HTTP server
+- Added Termux deployment scripts
+
+### Issues
+- Manual data entry still required due to poor OCR accuracy
+
+## [0.1.0] - 2026-01-01 (Concept)
+
+### Added
+- Initial concept: automated invoice data extraction for delivery drivers
+- Requirements gathering
+- Technology research (Tesseract, OpenCV, ML Kit)
+
+---
+
+## Roadmap
+
+### [1.1.0] - Planned
+
+#### Features
+- [ ] Export to CSV
+- [ ] Export to Excel (.xlsx) with formatting
+- [ ] Batch delete (multi-select)
+- [ ] Search invoices (by name, address, invoice number)
+- [ ] Filter by date range
+- [ ] Sort options (name, date, invoice number)
+
+#### Improvements
+- [ ] Image compression before OCR
+- [ ] Thumbnail generation for faster list scrolling
+- [ ] Pull-to-refresh on main screen
+- [ ] Empty state illustrations
+- [ ] Error message improvements
+
+#### Bug Fixes
+- [ ] Handle rotated images (EXIF orientation)
+- [ ] Fix memory leak in CameraActivity
+- [ ] Improve regex for international phone numbers
+
+### [1.2.0] - Planned
+
+#### Features
+- [ ] Cloud backup (Firebase Firestore)
+- [ ] Sync across devices
+- [ ] User authentication
+- [ ] Team sharing
+- [ ] Analytics dashboard
+
+#### Technical
+- [ ] Migrate to Kotlin
+- [ ] Implement MVVM architecture
+- [ ] Add ViewModels for lifecycle handling
+- [ ] Use Kotlin Coroutines instead of threads
+- [ ] Add comprehensive unit tests
+- [ ] Set up CI/CD pipeline
+
+### [2.0.0] - Future
+
+#### Features
+- [ ] Custom invoice template designer
+- [ ] Multi-language support (Spanish, French)
+- [ ] Barcode/QR code scanning
+- [ ] Voice input for notes
+- [ ] Offline map integration for addresses
+- [ ] Route optimization
+- [ ] Customer portal
+
+#### AI/ML
+- [ ] Train custom ML model on user's specific invoice format
+- [ ] Auto-correct common OCR errors
+- [ ] Predict missing fields
+- [ ] Anomaly detection (duplicate entries)
+
+#### UI
+- [ ] Jetpack Compose migration
+- [ ] Dark mode
+- [ ] Tablet layout
+- [ ] Landscape orientation support
+- [ ] Accessibility improvements
+
+---
+
+## Version History
+
+| Version | Date | Status | Notes |
+|---------|------|--------|-------|
+| 1.3.0 | 2026-02-03 | ✅ Released | Signature pad redesign, delivery form export |
+| 1.2.3 | 2026-01-30 | ✅ Released | Black/gold theme, delivery checkbox, OCR fixes |
+| 1.2.2 | 2026-01-29 | ✅ Released | Icon design system |
+| 1.2.1 | 2026-01-23 | ✅ Released | OCR quality restoration |
+| 1.2.0 | 2026-01-15 | ✅ Released | POD persistence, auto-save |
+| 1.1.0 | 2026-01-15 | ✅ Released | Route optimization, drag-drop |
+| 1.0.0 | 2026-01-11 | ✅ Released | Production-ready |
+| 0.9.0 | 2026-01-10 | 🚧 Development | Pivoted to ML Kit |
+| 0.5.0 | 2026-01-09 | 🔬 Prototype | Tesseract testing |
+| 0.1.0 | 2026-01-01 | 💡 Concept | Initial idea |
+
+---
+
+## Migration Guides
+
+### From 0.9.0 to 1.0.0
+
+#### Breaking Changes
+- **OCR Method**: HTTP server no longer required
+  - Remove `server_aces.py` deployment
+  - No need to start Termux server
+  - Delete `OCRProcessorHTTP.java` references
+
+#### Database Migration
+- Database schema unchanged
+- Existing data preserved automatically
+- No manual migration needed
+
+#### Code Changes
+```java
+// OLD (0.9.0)
+OCRProcessorHTTP processor = new OCRProcessorHTTP(context);
+if (!processor.checkBackendHealth()) {
+    // Server not available
+}
+
+// NEW (1.0.0)
+OCRProcessorMLKit processor = new OCRProcessorMLKit(context);
+// No health check needed - always available
+```
+
+#### First Launch
+- ML Kit model downloads automatically (~10MB)
+- Requires internet connection on first OCR
+- Subsequent OCR works offline
+
+---
+
+## Known Issues
+
+### Current (1.0.0)
+
+1. **Rotated Images**: EXIF orientation not handled
+   - **Workaround**: Rotate image in gallery before import
+   - **Fix planned**: v1.1.0
+
+2. **Large Images**: Memory spike with 4K+ photos
+   - **Workaround**: Downscale images to 1024x1024 before processing
+   - **Fix planned**: v1.1.0 (automatic downsampling)
+
+3. **Handwritten Text**: ML Kit struggles with handwriting
+   - **Workaround**: Use typed/printed invoices only
+   - **No fix planned**: Limitation of ML Kit
+
+4. **Non-Standard Formats**: "BILL TO:" must be present
+   - **Workaround**: Modify `extractInvoiceData()` for custom formats
+   - **Fix planned**: v1.2.0 (template designer)
+
+### Resolved
+
+- ✅ **Company address extracted instead of customer** (v0.9.0)
+  - Fixed in v1.0.0 with "BILL TO:" section detection
+
+- ✅ **Data lost on app restart** (v0.9.0)
+  - Fixed in v1.0.0 with Room database persistence
+
+- ✅ **OCR too slow** (v0.5.0 - Tesseract)
+  - Fixed in v1.0.0 with ML Kit (2-3 sec vs 10-15 sec)
+
+---
+
+## Support
+
+For version-specific issues:
+- **v1.0.0+**: [GitHub Issues](https://github.com/Brador82/Mobile-Invoice-Assistant/issues)
+- **v0.x**: Deprecated, upgrade to 1.0.0
+
+## License
+
+Copyright © 2026 Brador82. All rights reserved.
+

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Black & Gold Theme -->
+    <color name="black">#FF000000</color>
+    <color name="rich_black">#0D0D0D</color>
+    <color name="dark_charcoal">#1A1A1A</color>
+    <color name="charcoal">#2B2B2B</color>
+    
+    <!-- Gold Accent Colors -->
+    <color name="gold">#FFD700</color>
+    <color name="rich_gold">#D4AF37</color>
+    <color name="antique_gold">#C5A572</color>
+    <color name="champagne">#F7E7CE</color>
+    
+    <!-- Neutral Tones -->
+    <color name="white">#FFFFFFFF</color>
+    <color name="light_tan">#E8DCC4</color>
+    <color name="medium_tan">#C9B896</color>
+    <color name="warm_gray">#8B8680</color>
+    <color name="medium_gray">#5A5A5A</color>
+    <color name="light_gray">#E5E5E5</color>
+    
+    <!-- Legacy colors for compatibility -->
+    <color name="primary">#D4AF37</color>
+    <color name="primary_dark">#0D0D0D</color>
+    <color name="accent">#FFD700</color>
+    <color name="dark_gray">#2B2B2B</color>
+    <color name="dark_background">#1A1A1A</color>
+    <color name="card_background">#2B2B2B</color>
+</resources>

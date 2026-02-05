@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Black & Gold Theme with High Contrast -->
+    <style name="Theme.MobileInvoiceOCR" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Primary: Rich Black -->
+        <item name="colorPrimary">@color/rich_black</item>
+        <item name="colorPrimaryVariant">@color/black</item>
+        <item name="colorOnPrimary">@color/gold</item>
+        
+        <!-- Secondary: Gold Accent -->
+        <item name="colorSecondary">@color/rich_gold</item>
+        <item name="colorSecondaryVariant">@color/antique_gold</item>
+        <item name="colorOnSecondary">@color/black</item>
+        
+        <!-- Background Colors -->
+        <item name="android:colorBackground">@color/dark_charcoal</item>
+        <item name="colorSurface">@color/charcoal</item>
+        <item name="colorOnSurface">@color/champagne</item>
+        <item name="colorOnBackground">@color/light_tan</item>
+        
+        <!-- Status Bar -->
+        <item name="android:statusBarColor">@color/black</item>
+        
+        <!-- Text Colors for High Visibility -->
+        <item name="android:textColorPrimary">@color/champagne</item>
+        <item name="android:textColorSecondary">@color/light_tan</item>
+        <item name="android:textColorHint">@color/medium_tan</item>
+    </style>
+
+    <!-- Fullscreen theme for signature capture -->
+    <style name="Theme.MobileInvoiceOCR.Fullscreen" parent="Theme.MobileInvoiceOCR">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+    <style name="ButtonStyle" parent="Widget.MaterialComponents.Button">
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+
+    <style name="CardStyle" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">12dp</item>
+        <item name="cardElevation">4dp</item>
+        <item name="cardUseCompatPadding">true</item>
+        <item name="contentPadding">16dp</item>
+    </style>
+</resources>
