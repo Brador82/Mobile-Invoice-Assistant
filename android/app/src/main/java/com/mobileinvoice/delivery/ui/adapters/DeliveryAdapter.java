@@ -18,6 +18,7 @@ import com.mobileinvoice.ocr.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Modern RecyclerView Adapter for Deliveries
@@ -52,17 +53,10 @@ public class DeliveryAdapter extends ListAdapter<Delivery, DeliveryAdapter.Deliv
 
         @Override
         public boolean areContentsTheSame(@NonNull Delivery oldItem, @NonNull Delivery newItem) {
-            return oldItem.getStatus() == newItem.getStatus()
+            return Objects.equals(oldItem.getStatus(), newItem.getStatus())
                 && oldItem.getRouteOrder() == newItem.getRouteOrder()
-                && oldItem.getPriority() == newItem.getPriority()
-                && equalsOrBothNull(oldItem.getCustomerName(), newItem.getCustomerName());
-        }
-        
-        private boolean equalsOrBothNull(Object a, Object b) {
-            if (a == null && b == null) return true;
-            if (a == null || b == null) return false;
-            return a.equals(b);
-        }
+                && Objects.equals(oldItem.getPriority(), newItem.getPriority())
+                && Objects.equals(oldItem.getCustomerName(), newItem.getCustomerName());
     };
     
     @NonNull

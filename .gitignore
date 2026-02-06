@@ -194,7 +194,16 @@ invoice_template_with_anchors*.json
 android/device_log.txt
 android/device_log_after_install.txt
 android/logs.bat
+android/full_log
+android/full_log.txt
+android/ocr_log.txt
 android/app/build/
+
+# Claude Code local config
+.claude/
+
+# Git backup directories
+.git_backup/
 
 # Workspace files (user-specific)
 *.code-workspace
